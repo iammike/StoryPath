@@ -8,7 +8,11 @@
       "Bash(xcodebuild test:*)",
       "Bash(xcodebuild:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Logs/Test/**)",
+      "Bash(swift test:*)",
+      "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Build/Intermediates.noindex/**)",
+      "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Build/**)"
     ],
     "deny": [],
     "ask": []
