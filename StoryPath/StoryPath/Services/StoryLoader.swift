@@ -9,14 +9,28 @@ enum StoryLoaderError: Error {
     case fileNotFound
     case fileReadError(Error)
     case decodingError(Error)
+    case invalidStory(warnings: [String])
 }
 
+/// Service responsible for loading and parsing story JSON files
+@MainActor
 class StoryLoader {
     static let shared = StoryLoader()
 
-    private init() {}
+    private var cache: [String: Story] = [:]
+    private let decoder: JSONDecoder
 
-    func loadStory(withId storyId: String) throws -> Story {
+    private init() {
+        self.decoder = JSONDecoder()
+    }
+
+    /// Load a single story by ID with optional validation
+    func loadStory(withId storyId: String, validate: Bool = true) async throws -> Story {
+        // Check cache first
+        if let cachedStory = cache[storyId] {
+            return cachedStory
+        }
+
         guard let url = Bundle.main.url(forResource: storyId, withExtension: "json", subdirectory: "Stories") else {
             throw StoryLoaderError.fileNotFound
         }
@@ -28,16 +42,29 @@ class StoryLoader {
             throw StoryLoaderError.fileReadError(error)
         }
 
+        let story: Story
         do {
-            let decoder = JSONDecoder()
-            let story = try decoder.decode(Story.self, from: data)
-            return story
+            story = try decoder.decode(Story.self, from: data)
         } catch {
             throw StoryLoaderError.decodingError(error)
         }
+
+        // Validate story structure if requested
+        if validate {
+            let warnings = validateStory(story)
+            if !warnings.isEmpty {
+                throw StoryLoaderError.invalidStory(warnings: warnings)
+            }
+        }
+
+        // Cache the story
+        cache[storyId] = story
+
+        return story
     }
 
-    func loadAllStories() -> [Story] {
+    /// Load all available stories from the Stories directory
+    func loadAllStories(validate: Bool = true) async -> [Story] {
         guard let resourcePath = Bundle.main.resourcePath else {
             return []
         }
@@ -49,20 +76,43 @@ class StoryLoader {
             return []
         }
 
-        let stories: [Story] = storyFiles.compactMap { filename in
-            guard filename.hasSuffix(".json") else { return nil }
+        var stories: [Story] = []
+
+        for filename in storyFiles {
+            guard filename.hasSuffix(".json") else { continue }
             let storyId = filename.replacingOccurrences(of: ".json", with: "")
-            return try? loadStory(withId: storyId)
+
+            if let story = try? await loadStory(withId: storyId, validate: validate) {
+                stories.append(story)
+            }
         }
 
         return stories
     }
 
+    /// Get a story segment by ID within a loaded story
+    func getSegment(withId segmentId: String, in story: Story) -> StorySegment? {
+        return story.segments.first { $0.id == segmentId }
+    }
+
+    /// Find the starting segment for a story
+    func getStartingSegment(for story: Story) -> StorySegment? {
+        return story.segments.first
+    }
+
+    /// Validate story structure and return warnings
     func validateStory(_ story: Story) -> [String] {
         var warnings: [String] = []
 
+        // Check if story has segments
+        if story.segments.isEmpty {
+            warnings.append("Story has no segments")
+            return warnings
+        }
+
         let segmentIds = Set(story.segments.map { $0.id })
 
+        // Validate segment references
         for segment in story.segments {
             for choice in segment.choices {
                 if !segmentIds.contains(choice.nextSegmentId) {
@@ -71,15 +121,50 @@ class StoryLoader {
             }
         }
 
+        // Check for authentic path
         let hasAuthenticPath = story.segments.contains { $0.isAuthenticPath }
         if !hasAuthenticPath {
             warnings.append("Story has no segments marked as authentic path")
         }
 
-        if story.segments.isEmpty {
-            warnings.append("Story has no segments")
+        // Check for unreachable segments (except the first one)
+        let firstSegmentId = story.segments.first?.id
+        var reachableSegments = Set<String>()
+        if let firstId = firstSegmentId {
+            reachableSegments.insert(firstId)
+            findReachableSegments(from: firstId, in: story, reachable: &reachableSegments)
+        }
+
+        for segment in story.segments {
+            if segment.id != firstSegmentId && !reachableSegments.contains(segment.id) {
+                warnings.append("Segment '\(segment.id)' is unreachable from the story start")
+            }
         }
 
         return warnings
+    }
+
+    /// Helper to recursively find all reachable segments
+    private func findReachableSegments(from segmentId: String, in story: Story, reachable: inout Set<String>) {
+        guard let segment = story.segments.first(where: { $0.id == segmentId }) else {
+            return
+        }
+
+        for choice in segment.choices {
+            if !reachable.contains(choice.nextSegmentId) {
+                reachable.insert(choice.nextSegmentId)
+                findReachableSegments(from: choice.nextSegmentId, in: story, reachable: &reachable)
+            }
+        }
+    }
+
+    /// Clear the story cache
+    func clearCache() {
+        cache.removeAll()
+    }
+
+    /// Preload a story into cache without validation
+    func preloadStory(withId storyId: String) async {
+        _ = try? await loadStory(withId: storyId, validate: false)
     }
 }
