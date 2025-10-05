@@ -144,16 +144,21 @@ class StoryLoader {
         return warnings
     }
 
-    /// Helper to recursively find all reachable segments
+    /// Helper to iteratively find all reachable segments
     private func findReachableSegments(from segmentId: String, in story: Story, reachable: inout Set<String>) {
-        guard let segment = story.segments.first(where: { $0.id == segmentId }) else {
-            return
-        }
+        var stack: [String] = [segmentId]
 
-        for choice in segment.choices {
-            if !reachable.contains(choice.nextSegmentId) {
-                reachable.insert(choice.nextSegmentId)
-                findReachableSegments(from: choice.nextSegmentId, in: story, reachable: &reachable)
+        while !stack.isEmpty {
+            let currentId = stack.removeLast()
+            guard let segment = story.segments.first(where: { $0.id == currentId }) else {
+                continue
+            }
+
+            for choice in segment.choices {
+                if !reachable.contains(choice.nextSegmentId) {
+                    reachable.insert(choice.nextSegmentId)
+                    stack.append(choice.nextSegmentId)
+                }
             }
         }
     }
