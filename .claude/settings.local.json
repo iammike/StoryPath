@@ -12,7 +12,9 @@
       "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Logs/Test/**)",
       "Bash(swift test:*)",
       "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Build/Intermediates.noindex/**)",
-      "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Build/**)"
+      "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Build/**)",
+      "Bash(find:*)",
+      "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/**)"
     ],
     "deny": [],
     "ask": []

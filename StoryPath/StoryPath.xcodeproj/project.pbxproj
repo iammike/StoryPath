@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EFDB94432E93041C007C2A2A /* StoryPath.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = EFDB94422E93041C007C2A2A /* StoryPath.xctestplan */; };
+		EFDB94442E93041C007C2A2A /* StoryPath.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = EFDB94422E93041C007C2A2A /* StoryPath.xctestplan */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		EF919DF62E906A8D0061A7D0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +32,7 @@
 		EF919DE82E906A8C0061A7D0 /* StoryPath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryPath.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF919DF52E906A8D0061A7D0 /* StoryPathTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StoryPathTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF919DFF2E906A8D0061A7D0 /* StoryPathUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StoryPathUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EFDB94422E93041C007C2A2A /* StoryPath.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoryPath.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +81,7 @@
 		EF919DDF2E906A8C0061A7D0 = {
 			isa = PBXGroup;
 			children = (
+				EFDB94422E93041C007C2A2A /* StoryPath.xctestplan */,
 				EF919DEA2E906A8C0061A7D0 /* StoryPath */,
 				EF919DF82E906A8D0061A7D0 /* StoryPathTests */,
 				EF919E022E906A8D0061A7D0 /* StoryPathUITests */,
@@ -212,6 +219,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EFDB94442E93041C007C2A2A /* StoryPath.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +227,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EFDB94432E93041C007C2A2A /* StoryPath.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
