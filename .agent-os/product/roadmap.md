@@ -12,9 +12,10 @@
 
 ### Features
 
-- [ ] Xcode project setup with SwiftUI and SwiftData - Create project structure, configure build settings, set up Git repository `S`
-- [ ] Story data model - Design JSON schema for story structure, decision trees, paths, and metadata `M`
-- [ ] Story content parser - Build system to load and parse story JSON into app data structures `M`
+- [x] Xcode project setup with SwiftUI and SwiftData - Create project structure, configure build settings, set up Git repository `S`
+- [ ] GitHub Actions CI/CD - Setup automated testing that must pass before merging PRs `S`
+- [x] Story data model - Design JSON schema for story structure, decision trees, paths, and metadata `M`
+- [x] Story content parser - Build system to load and parse story JSON into app data structures `M`
 - [ ] Basic story reading UI - Create scrollable story view with text display and navigation `M`
 - [ ] Decision point interface - Interactive choice buttons with branching logic `M`
 - [ ] Audio playback system - AVFoundation integration with play/pause/skip controls `M`

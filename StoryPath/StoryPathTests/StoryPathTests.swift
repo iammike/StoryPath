@@ -56,7 +56,7 @@ struct StoryPathTests {
 
         let data = try #require(json.data(using: .utf8))
         let decoder = JSONDecoder()
-        let story = try await decoder.decode(Story.self, from: data)
+        let story = try decoder.decode(Story.self, from: data)
 
         #expect(story.id == "test-story")
         #expect(story.title == "Test Story")
@@ -122,7 +122,7 @@ struct StoryPathTests {
         """
 
         let data = try #require(json.data(using: .utf8))
-        let story = try await JSONDecoder().decode(Story.self, from: data)
+        let story = try JSONDecoder().decode(Story.self, from: data)
 
         #expect(story.pathCount == 2)
     }
@@ -198,7 +198,7 @@ struct StoryPathTests {
         """
 
         let data = try #require(json.data(using: .utf8))
-        let story = try await JSONDecoder().decode(Story.self, from: data)
+        let story = try JSONDecoder().decode(Story.self, from: data)
 
         let loader = StoryLoader.shared
         let warnings = loader.validateStory(story)
@@ -243,7 +243,7 @@ struct StoryPathTests {
         """
 
         let data = try #require(json.data(using: .utf8))
-        let story = try await JSONDecoder().decode(Story.self, from: data)
+        let story = try JSONDecoder().decode(Story.self, from: data)
 
         let loader = StoryLoader.shared
         let warnings = loader.validateStory(story)

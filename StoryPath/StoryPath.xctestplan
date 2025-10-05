@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "6F3E5C7D-8A9B-4E1F-9C2D-3A4B5C6D7E8F",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:StoryPath.xcodeproj",
+      "identifier" : "EF919DE72E906A8C0061A7D0",
+      "name" : "StoryPath"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:StoryPath.xcodeproj",
+        "identifier" : "EF919DF42E906A8D0061A7D0",
+        "name" : "StoryPathTests"
+      }
+    }
+  ],
+  "version" : 1
+}
