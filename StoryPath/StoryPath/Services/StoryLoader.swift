@@ -19,9 +19,11 @@ class StoryLoader {
 
     private var cache: [String: Story] = [:]
     private let decoder: JSONDecoder
+    private let bundle: Bundle
 
-    private init() {
+    init(bundle: Bundle = Bundle(for: Story.self)) {
         self.decoder = JSONDecoder()
+        self.bundle = bundle
     }
 
     /// Load a single story by ID with optional validation
@@ -31,7 +33,7 @@ class StoryLoader {
             return cachedStory
         }
 
-        guard let url = Bundle.main.url(forResource: storyId, withExtension: "json", subdirectory: "Stories") else {
+        guard let url = bundle.url(forResource: storyId, withExtension: "json", subdirectory: "Stories") else {
             throw StoryLoaderError.fileNotFound
         }
 
@@ -65,7 +67,7 @@ class StoryLoader {
 
     /// Load all available stories from the Stories directory
     func loadAllStories(validate: Bool = true) async -> [Story] {
-        guard let resourcePath = Bundle.main.resourcePath else {
+        guard let resourcePath = bundle.resourcePath else {
             return []
         }
 
