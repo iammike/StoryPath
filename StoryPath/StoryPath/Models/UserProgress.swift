@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct UserProgress: Codable {
+struct UserProgress: Codable, Sendable {
     let storyId: String
     var currentSegmentId: String
     var pathHistory: [String]
@@ -33,7 +33,7 @@ struct UserProgress: Codable {
     }
 }
 
-struct Bookmark: Codable, Identifiable {
+struct Bookmark: Codable, Identifiable, Sendable {
     let id: UUID
     let storyId: String
     let segmentId: String

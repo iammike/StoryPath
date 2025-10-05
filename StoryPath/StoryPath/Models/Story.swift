@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct Story: Codable, Identifiable {
+struct Story: Codable, Identifiable, Sendable {
     let id: String
     let title: String
     let author: String
@@ -48,7 +48,7 @@ struct Story: Codable, Identifiable {
     }
 }
 
-struct StorySegment: Codable, Identifiable {
+struct StorySegment: Codable, Identifiable, Sendable {
     let id: String
     let text: String
     let audioFileName: String?
@@ -61,7 +61,7 @@ struct StorySegment: Codable, Identifiable {
     }
 }
 
-struct StoryChoice: Codable, Identifiable {
+struct StoryChoice: Codable, Identifiable, Sendable {
     let id: String
     let text: String
     let nextSegmentId: String
