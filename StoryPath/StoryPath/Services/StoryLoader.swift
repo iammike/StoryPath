@@ -7,7 +7,7 @@ import Foundation
 
 enum StoryLoaderError: Error {
     case fileNotFound
-    case invalidJSON
+    case fileReadError(Error)
     case decodingError(Error)
 }
 
@@ -21,7 +21,12 @@ class StoryLoader {
             throw StoryLoaderError.fileNotFound
         }
 
-        let data = try Data(contentsOf: url)
+        let data: Data
+        do {
+            data = try Data(contentsOf: url)
+        } catch {
+            throw StoryLoaderError.fileReadError(error)
+        }
 
         do {
             let decoder = JSONDecoder()

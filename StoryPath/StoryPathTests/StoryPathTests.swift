@@ -53,7 +53,7 @@ struct StoryPathTests {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = try #require(json.data(using: .utf8))
         let decoder = JSONDecoder()
         let story = try decoder.decode(Story.self, from: data)
 
@@ -120,7 +120,7 @@ struct StoryPathTests {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = try #require(json.data(using: .utf8))
         let story = try JSONDecoder().decode(Story.self, from: data)
 
         #expect(story.pathCount == 2)

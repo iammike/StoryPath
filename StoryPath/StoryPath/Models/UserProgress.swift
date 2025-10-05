@@ -18,15 +18,18 @@ struct UserProgress: Codable {
         lastReadDate = Date()
     }
 
-    mutating func markPathComplete() {
+    mutating func markPathComplete(totalPaths: Int) {
         let pathSignature = pathHistory.joined(separator: "-")
         completedPaths.insert(pathSignature)
-        updateCompletionPercentage()
+        updateCompletionPercentage(totalPaths: totalPaths)
     }
 
-    mutating func updateCompletionPercentage() {
-        // This will be calculated based on total paths in story
-        // Implementation can be enhanced with actual story data
+    mutating func updateCompletionPercentage(totalPaths: Int) {
+        guard totalPaths > 0 else {
+            completionPercentage = 0.0
+            return
+        }
+        completionPercentage = Double(completedPaths.count) / Double(totalPaths)
     }
 }
 
