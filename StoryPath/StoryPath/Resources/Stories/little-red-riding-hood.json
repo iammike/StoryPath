@@ -1,0 +1,205 @@
+{
+  "id": "little-red-riding-hood",
+  "title": "Little Red Riding Hood",
+  "author": "Brothers Grimm",
+  "originalSource": "Grimms' Fairy Tales (1812)",
+  "culturalOrigin": "German",
+  "synopsis": "A young girl in a red cloak visits her grandmother in the woods, but encounters a cunning wolf along the way.",
+  "coverImageName": "little-red-riding-hood-cover",
+  "estimatedReadingMinutes": 12,
+  "ageRange": "4-8",
+  "tags": ["classic", "fairy-tale", "animals", "family"],
+  "isPurchased": true,
+  "segments": [
+    {
+      "id": "start",
+      "text": "Once upon a time, there was a sweet little girl who was loved by everyone who knew her. Her grandmother had made her a beautiful red velvet cloak with a hood, and she wore it so often that everyone called her Little Red Riding Hood.\n\nOne day, her mother said, 'Little Red Riding Hood, your grandmother is not feeling well. I've packed a basket with cake and wine. Please take it to her house in the woods, but remember to stay on the path and don't talk to strangers.'",
+      "audioFileName": "lrrh-start.m4a",
+      "imageFileName": "lrrh-mother-basket.png",
+      "isAuthenticPath": true,
+      "choices": [
+        {
+          "id": "choice-path",
+          "text": "I'll stay on the path just like Mother said.",
+          "nextSegmentId": "forest-path-authentic",
+          "isAuthenticPath": true
+        },
+        {
+          "id": "choice-shortcut",
+          "text": "I know a shortcut through the meadow!",
+          "nextSegmentId": "meadow-shortcut",
+          "isAuthenticPath": false
+        },
+        {
+          "id": "choice-friend",
+          "text": "Maybe I should ask someone to come with me.",
+          "nextSegmentId": "bring-friend",
+          "isAuthenticPath": false
+        }
+      ]
+    },
+    {
+      "id": "forest-path-authentic",
+      "text": "Little Red Riding Hood walked carefully along the forest path, just as her mother had instructed. The trees were tall and ancient, their branches forming a canopy overhead. Birds sang sweetly in the branches.\n\nSuddenly, a wolf appeared on the path before her. 'Good morning, Little Red Riding Hood,' said the wolf in a friendly voice. 'Where are you going so early?'\n\n'I'm going to visit my grandmother,' she replied innocently. 'She lives in the cottage at the end of the forest path.'",
+      "audioFileName": "lrrh-wolf-encounter.m4a",
+      "imageFileName": "lrrh-wolf-path.png",
+      "isAuthenticPath": true,
+      "choices": [
+        {
+          "id": "choice-tell-wolf",
+          "text": "Tell the wolf about grandmother's illness and the basket.",
+          "nextSegmentId": "wolf-learns-details",
+          "isAuthenticPath": true
+        },
+        {
+          "id": "choice-suspicious",
+          "text": "Feel suspicious and hurry away without answering.",
+          "nextSegmentId": "run-from-wolf",
+          "isAuthenticPath": false
+        },
+        {
+          "id": "choice-pick-flowers",
+          "text": "The wolf suggests picking flowers for grandmother.",
+          "nextSegmentId": "pick-flowers",
+          "isAuthenticPath": true
+        }
+      ]
+    },
+    {
+      "id": "wolf-learns-details",
+      "text": "'My grandmother is feeling poorly,' Little Red Riding Hood explained. 'I'm bringing her cake and wine to make her feel better.'\n\n'How thoughtful!' said the wolf, his eyes gleaming. 'Where does your grandmother live?'\n\n'In the cottage at the end of this path, under the three oak trees,' she answered.\n\nThe wolf smiled with all his teeth. 'Why don't you pick some flowers for her? I'm sure she would love them.' Then he bounded off into the woods.",
+      "audioFileName": "lrrh-wolf-departs.m4a",
+      "imageFileName": "lrrh-wolf-suggestion.png",
+      "isAuthenticPath": true,
+      "choices": [
+        {
+          "id": "choice-flowers-yes",
+          "text": "Pick flowers for grandmother.",
+          "nextSegmentId": "pick-flowers",
+          "isAuthenticPath": true
+        },
+        {
+          "id": "choice-flowers-no",
+          "text": "Hurry straight to grandmother's house.",
+          "nextSegmentId": "arrive-too-late",
+          "isAuthenticPath": false
+        }
+      ]
+    },
+    {
+      "id": "pick-flowers",
+      "text": "Little Red Riding Hood thought picking flowers was a wonderful idea. She wandered off the path into a sunny glade where beautiful wildflowers grew. She picked daisies, buttercups, and violets, making a lovely bouquet.\n\nBut while she was gathering flowers, the wolf ran straight to grandmother's cottage by the quickest route.",
+      "audioFileName": "lrrh-flowers.m4a",
+      "imageFileName": "lrrh-picking-flowers.png",
+      "isAuthenticPath": true,
+      "choices": [
+        {
+          "id": "choice-continue",
+          "text": "Continue to grandmother's house with the flowers.",
+          "nextSegmentId": "arrive-cottage",
+          "isAuthenticPath": true
+        }
+      ]
+    },
+    {
+      "id": "arrive-cottage",
+      "text": "The wolf reached grandmother's cottage first. He knocked gently on the door.\n\n'Who is there?' called grandmother from her bed.\n\n'It's Little Red Riding Hood,' said the wolf in a high voice. 'I've brought you cake and wine!'\n\n'Lift the latch and come in,' said grandmother. 'I'm too weak to get up.'\n\nThe wolf lifted the latch and rushed to grandmother's bed. Before she could scream, he swallowed her whole! Then he put on her nightgown and cap and climbed into her bed to wait.",
+      "audioFileName": "lrrh-wolf-eats-grandma.m4a",
+      "imageFileName": "lrrh-wolf-in-bed.png",
+      "isAuthenticPath": true,
+      "choices": [
+        {
+          "id": "choice-knock",
+          "text": "Little Red Riding Hood arrives and knocks.",
+          "nextSegmentId": "famous-dialogue",
+          "isAuthenticPath": true
+        }
+      ]
+    },
+    {
+      "id": "famous-dialogue",
+      "text": "Little Red Riding Hood knocked on the door.\n\n'Who is there?' came a gruff voice.\n\n'It's Little Red Riding Hood with cake and wine!'\n\n'Lift the latch and come in,' said the wolf, trying to sound sweet.\n\nLittle Red Riding Hood entered and approached the bed. Something seemed strange about grandmother.\n\n'Grandmother, what big ears you have!'\n'All the better to hear you with, my dear.'\n\n'Grandmother, what big eyes you have!'\n'All the better to see you with, my dear.'\n\n'Grandmother, what big teeth you have!'\n'All the better to EAT you with!'",
+      "audioFileName": "lrrh-dialogue.m4a",
+      "imageFileName": "lrrh-big-teeth.png",
+      "isAuthenticPath": true,
+      "choices": [
+        {
+          "id": "choice-eaten",
+          "text": "What happens next?",
+          "nextSegmentId": "huntsman-rescue",
+          "isAuthenticPath": true
+        }
+      ]
+    },
+    {
+      "id": "huntsman-rescue",
+      "text": "The wolf leaped from the bed and swallowed Little Red Riding Hood in one gulp! Then, feeling very full, he climbed back into bed and fell into a deep sleep, snoring loudly.\n\nA huntsman passing by heard the terrible snoring and thought something must be wrong. He entered the cottage and saw the wolf with his swollen belly. Quickly, he took his scissors and cut open the wolf's stomach. Out jumped Little Red Riding Hood and her grandmother, both safe!\n\nThey filled the wolf's belly with heavy stones. When the wolf woke and tried to run away, the stones were so heavy that he fell down dead.\n\nLittle Red Riding Hood learned her lesson: always listen to your mother and never talk to strangers in the woods.",
+      "audioFileName": "lrrh-rescue.m4a",
+      "imageFileName": "lrrh-huntsman.png",
+      "isAuthenticPath": true,
+      "choices": []
+    },
+    {
+      "id": "meadow-shortcut",
+      "text": "Little Red Riding Hood decided to take the shortcut through the sunny meadow. She skipped through fields of wildflowers, chasing butterflies and singing songs. The meadow was so beautiful that she almost forgot about her grandmother.\n\nBut this path took much longer than she expected, and she got lost trying to find her way back to the forest path.",
+      "audioFileName": "lrrh-meadow.m4a",
+      "imageFileName": "lrrh-meadow.png",
+      "isAuthenticPath": false,
+      "choices": [
+        {
+          "id": "choice-find-path",
+          "text": "Try to find the way to grandmother's house.",
+          "nextSegmentId": "lost-in-woods",
+          "isAuthenticPath": false
+        }
+      ]
+    },
+    {
+      "id": "lost-in-woods",
+      "text": "After wandering for hours, Little Red Riding Hood finally found a path through the forest. She was tired and worried. When she finally reached grandmother's cottage, it was getting dark.\n\nShe knocked on the door and grandmother answered, perfectly healthy and wondering where she had been! The basket of cake and wine made a lovely evening snack, and Little Red Riding Hood promised to always follow her mother's directions from now on.",
+      "audioFileName": "lrrh-lost-ending.m4a",
+      "imageFileName": "lrrh-late-arrival.png",
+      "isAuthenticPath": false,
+      "choices": []
+    },
+    {
+      "id": "bring-friend",
+      "text": "Little Red Riding Hood went to her friend Peter's house and asked if he would walk with her to grandmother's cottage. Peter happily agreed, and they set off together through the forest.\n\nWhen they met the wolf on the path, Peter immediately recognized the danger. 'That's a wolf!' he shouted. 'We should run!' They hurried down the path together, and the wolf, seeing two children instead of one, decided to look for easier prey elsewhere.",
+      "audioFileName": "lrrh-friend.m4a",
+      "imageFileName": "lrrh-with-friend.png",
+      "isAuthenticPath": false,
+      "choices": [
+        {
+          "id": "choice-safe-arrival",
+          "text": "Continue safely to grandmother's house.",
+          "nextSegmentId": "safe-arrival",
+          "isAuthenticPath": false
+        }
+      ]
+    },
+    {
+      "id": "safe-arrival",
+      "text": "Little Red Riding Hood and Peter arrived safely at grandmother's cottage. Grandmother was delighted to see them both and very grateful for the cake and wine. They all had a pleasant visit, and Peter walked Little Red Riding Hood safely home before dark.\n\nLittle Red Riding Hood learned that it's always safer to travel with a friend, and that sometimes changing plans can lead to happy outcomes.",
+      "audioFileName": "lrrh-safe-ending.m4a",
+      "imageFileName": "lrrh-happy-ending.png",
+      "isAuthenticPath": false,
+      "choices": []
+    },
+    {
+      "id": "run-from-wolf",
+      "text": "Little Red Riding Hood felt frightened by the wolf's sharp teeth and gleaming eyes. Without answering, she clutched her basket tightly and ran as fast as she could down the forest path.\n\nThe wolf was surprised by her sudden flight and didn't follow. Little Red Riding Hood arrived at grandmother's cottage out of breath but safe. Grandmother was feeling much better and thanked her for the wonderful gift.",
+      "audioFileName": "lrrh-run-ending.m4a",
+      "imageFileName": "lrrh-running.png",
+      "isAuthenticPath": false,
+      "choices": []
+    },
+    {
+      "id": "arrive-too-late",
+      "text": "Little Red Riding Hood hurried straight to grandmother's cottage without stopping. But when she arrived, she found the door hanging open and the cottage in disarray. The wolf had already been there!\n\nJust then, the huntsman arrived, having tracked the wolf through the forest. Together they searched and found grandmother hiding in the closet, where she had locked herself when she heard the wolf at the door. Everyone was safe, and Little Red Riding Hood learned to trust her instincts about danger.",
+      "audioFileName": "lrrh-alternate-ending.m4a",
+      "imageFileName": "lrrh-closet-rescue.png",
+      "isAuthenticPath": false,
+      "choices": []
+    }
+  ]
+}
