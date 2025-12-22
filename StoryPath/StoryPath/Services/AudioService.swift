@@ -26,7 +26,14 @@ class AudioService: NSObject {
     }
 
     func speak(_ text: String, onFinished: (() -> Void)? = nil) {
-        stop()
+        // Set state first to avoid UI flicker when restarting speech
+        isSpeaking = true
+        isPaused = false
+
+        // Stop current speech without clearing state
+        if synthesizer.isSpeaking {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
 
         self.onFinished = onFinished
 
@@ -37,8 +44,6 @@ class AudioService: NSObject {
         utterance.volume = 1.0
         utterance.voice = selectBestVoice()
 
-        isSpeaking = true
-        isPaused = false
         synthesizer.speak(utterance)
     }
 
@@ -109,8 +114,11 @@ extension AudioService: AVSpeechSynthesizerDelegate {
 
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
         Task { @MainActor in
-            self.isSpeaking = false
-            self.isPaused = false
+            // Only clear state if we're not already speaking new content
+            if !synthesizer.isSpeaking {
+                self.isSpeaking = false
+                self.isPaused = false
+            }
         }
     }
 }

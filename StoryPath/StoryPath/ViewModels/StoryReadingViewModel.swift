@@ -14,6 +14,7 @@ class StoryReadingViewModel {
     private(set) var errorMessage: String?
     private(set) var progress: UserProgress?
     var isAudioEnabled = false
+    private(set) var hasUsedAudioForSegment = false
 
     private let storyLoader: StoryLoader
     private let progressService: ProgressService
@@ -85,8 +86,9 @@ class StoryReadingViewModel {
     }
 
     func selectChoice(_ choice: StoryChoice) {
-        // Stop any current audio
+        // Stop any current audio and reset audio state for new segment
         audioService.stop()
+        hasUsedAudioForSegment = false
 
         currentSegmentId = choice.nextSegmentId
 
@@ -130,7 +132,33 @@ class StoryReadingViewModel {
 
     func speakCurrentSegment() {
         guard let segment = currentSegment else { return }
-        audioService.speak(segment.text)
+
+        hasUsedAudioForSegment = true
+
+        var textToSpeak = segment.text
+
+        // Add choices if not at an ending
+        if !segment.choices.isEmpty {
+            textToSpeak += "\n\nYour choices are: "
+            for (index, choice) in segment.choices.enumerated() {
+                textToSpeak += "\(index + 1). \(choice.text). "
+            }
+        }
+
+        audioService.speak(textToSpeak)
+    }
+
+    func speakChoices() {
+        guard let segment = currentSegment, !segment.choices.isEmpty else { return }
+
+        hasUsedAudioForSegment = true
+
+        var textToSpeak = "Your choices are: "
+        for (index, choice) in segment.choices.enumerated() {
+            textToSpeak += "\(index + 1). \(choice.text). "
+        }
+
+        audioService.speak(textToSpeak)
     }
 
     func stopAudio() {
