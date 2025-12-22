@@ -513,4 +513,95 @@ struct StoryPathTests {
         #expect(viewModel.isAudioEnabled == false)
     }
 
+    // MARK: - Bookmark Tests
+
+    @Test func testViewModelResumesFromBookmark() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-bookmark-resume")!
+        testDefaults.removePersistentDomain(forName: "test-bookmark-resume")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryReadingViewModel(progressService: progressService)
+
+        // Load story and make a choice to move past first segment
+        await viewModel.loadStory(withId: "little-red-riding-hood")
+        let startingSegmentId = viewModel.currentSegmentId
+
+        guard let segment = viewModel.currentSegment,
+              let firstChoice = segment.choices.first else {
+            Issue.record("No choices available")
+            return
+        }
+        viewModel.selectChoice(firstChoice)
+        let savedSegmentId = viewModel.currentSegmentId
+        #expect(savedSegmentId != startingSegmentId)
+
+        // Create new viewModel and load same story - should resume
+        let viewModel2 = StoryReadingViewModel(progressService: progressService)
+        await viewModel2.loadStory(withId: "little-red-riding-hood")
+
+        #expect(viewModel2.currentSegmentId == savedSegmentId)
+        #expect(viewModel2.didResumeFromBookmark == true)
+    }
+
+    @Test func testViewModelNoBookmarkOnFreshStart() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-bookmark-fresh")!
+        testDefaults.removePersistentDomain(forName: "test-bookmark-fresh")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryReadingViewModel(progressService: progressService)
+
+        await viewModel.loadStory(withId: "little-red-riding-hood")
+
+        #expect(viewModel.didResumeFromBookmark == false)
+    }
+
+    @Test func testViewModelDismissBookmarkOnChoice() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-bookmark-dismiss")!
+        testDefaults.removePersistentDomain(forName: "test-bookmark-dismiss")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+
+        // First, create some progress
+        let viewModel1 = StoryReadingViewModel(progressService: progressService)
+        await viewModel1.loadStory(withId: "little-red-riding-hood")
+        if let segment = viewModel1.currentSegment, let choice = segment.choices.first {
+            viewModel1.selectChoice(choice)
+        }
+
+        // Load again to get resume state
+        let viewModel2 = StoryReadingViewModel(progressService: progressService)
+        await viewModel2.loadStory(withId: "little-red-riding-hood")
+        #expect(viewModel2.didResumeFromBookmark == true)
+
+        // Make a choice - should dismiss bookmark notice
+        if let segment = viewModel2.currentSegment, let choice = segment.choices.first {
+            viewModel2.selectChoice(choice)
+        }
+        #expect(viewModel2.didResumeFromBookmark == false)
+    }
+
+    @Test func testViewModelDismissBookmarkOnRestart() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-bookmark-restart")!
+        testDefaults.removePersistentDomain(forName: "test-bookmark-restart")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+
+        // Create progress
+        let viewModel1 = StoryReadingViewModel(progressService: progressService)
+        await viewModel1.loadStory(withId: "little-red-riding-hood")
+        if let segment = viewModel1.currentSegment, let choice = segment.choices.first {
+            viewModel1.selectChoice(choice)
+        }
+
+        // Load again
+        let viewModel2 = StoryReadingViewModel(progressService: progressService)
+        await viewModel2.loadStory(withId: "little-red-riding-hood")
+        #expect(viewModel2.didResumeFromBookmark == true)
+
+        // Restart - should dismiss bookmark notice
+        viewModel2.restartStory()
+        #expect(viewModel2.didResumeFromBookmark == false)
+        #expect(viewModel2.isAtStart == true)
+    }
+
 }
