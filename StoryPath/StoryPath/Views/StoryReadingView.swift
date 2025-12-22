@@ -39,11 +39,11 @@ struct StoryReadingView: View {
         Button {
             viewModel.togglePlayPause()
         } label: {
-            Image(systemName: viewModel.audioService.isSpeaking && !viewModel.audioService.isPaused ? "pause.circle.fill" : "play.circle.fill")
+            Image(systemName: viewModel.audioService.isCurrentlyPlaying ? "pause.circle.fill" : "play.circle.fill")
                 .font(.system(size: 44))
                 .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
         }
-        .accessibilityLabel(viewModel.audioService.isSpeaking && !viewModel.audioService.isPaused ? "Pause reading" : "Read aloud")
+        .accessibilityLabel(viewModel.audioService.isCurrentlyPlaying ? "Pause reading" : "Read aloud")
     }
 
     // MARK: - Subviews

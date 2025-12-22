@@ -14,6 +14,10 @@ class AudioService: NSObject {
     private(set) var isSpeaking = false
     private(set) var isPaused = false
 
+    var isCurrentlyPlaying: Bool {
+        isSpeaking && !isPaused
+    }
+
     private var onFinished: (() -> Void)?
 
     override init() {
@@ -27,6 +31,7 @@ class AudioService: NSObject {
         self.onFinished = onFinished
 
         let utterance = AVSpeechUtterance(string: text)
+        // Slightly slower rate improves comprehension for children's story narration
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.85
         utterance.pitchMultiplier = 1.0
         utterance.volume = 1.0
