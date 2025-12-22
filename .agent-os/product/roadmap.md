@@ -20,7 +20,7 @@
 - [x] Decision point interface - Interactive choice buttons with branching logic `M`
 - [x] Audio playback system - Text-to-speech with play/pause controls and premium voice selection `M`
 - [x] Progress tracking - Track completed paths, current position, and story completion percentage `S`
-- [ ] Bookmark functionality - Save and restore reading position within stories `S`
+- [x] Bookmark functionality - Auto-resume with "continuing where you left off" notice `S`
 - [ ] First complete story - "Little Red Riding Hood" with 3-4 branching paths fully authored and narrated `XL`
 
 ### Dependencies

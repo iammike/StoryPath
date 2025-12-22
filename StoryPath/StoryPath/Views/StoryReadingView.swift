@@ -78,18 +78,46 @@ struct StoryReadingView: View {
         .padding()
     }
 
+    private var resumeBanner: some View {
+        HStack {
+            Image(systemName: "bookmark.fill")
+                .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+            Text("Continuing where you left off")
+                .font(.subheadline)
+            Spacer()
+            Button("Start Over") {
+                viewModel.restartStory()
+                viewModel.dismissBookmarkNotice()
+            }
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.15))
+        .onTapGesture {
+            viewModel.dismissBookmarkNotice()
+        }
+    }
+
     private func segmentContentView(_ segment: StorySegment) -> some View {
         ZStack(alignment: .bottomTrailing) {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
+                        // Resume banner
+                        if viewModel.didResumeFromBookmark {
+                            resumeBanner
+                                .id("top")
+                        }
+
                         // Story text
                         Text(segment.text)
                             .font(.custom("Georgia", size: 18))
                             .lineSpacing(6)
                             .padding(.horizontal, 20)
-                            .padding(.top, 20)
-                            .id("top")
+                            .padding(.top, viewModel.didResumeFromBookmark ? 0 : 20)
+                            .id(viewModel.didResumeFromBookmark ? "text" : "top")
 
                         // Choices or ending
                         if segment.isEnding {

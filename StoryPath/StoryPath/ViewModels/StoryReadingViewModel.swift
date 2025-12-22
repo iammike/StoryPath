@@ -15,6 +15,7 @@ class StoryReadingViewModel {
     private(set) var progress: UserProgress?
     var isAudioEnabled = false
     private(set) var hasUsedAudioForSegment = false
+    private(set) var didResumeFromBookmark = false
 
     private let storyLoader: StoryLoader
     private let progressService: ProgressService
@@ -27,6 +28,12 @@ class StoryReadingViewModel {
 
     var isAtEnding: Bool {
         currentSegment?.isEnding ?? false
+    }
+
+    var isAtStart: Bool {
+        guard let story = story,
+              let startingSegment = storyLoader.getStartingSegment(for: story) else { return false }
+        return currentSegmentId == startingSegment.id
     }
 
     var completedPathsCount: Int {
@@ -71,11 +78,14 @@ class StoryReadingViewModel {
                 if let existingProgress = progressService.loadProgress(for: storyId) {
                     progress = existingProgress
                     currentSegmentId = existingProgress.currentSegmentId
+                    // Check if we're resuming from a non-starting position
+                    didResumeFromBookmark = existingProgress.currentSegmentId != startingSegment.id
                 } else {
                     progress = progressService.createNewProgress(
                         for: storyId,
                         startingSegmentId: startingSegment.id
                     )
+                    didResumeFromBookmark = false
                 }
             }
         } catch {
@@ -89,6 +99,7 @@ class StoryReadingViewModel {
         // Stop any current audio and reset audio state for new segment
         audioService.stop()
         hasUsedAudioForSegment = false
+        didResumeFromBookmark = false
 
         currentSegmentId = choice.nextSegmentId
 
@@ -111,6 +122,8 @@ class StoryReadingViewModel {
 
     func restartStory() {
         audioService.stop()
+        hasUsedAudioForSegment = false
+        didResumeFromBookmark = false
 
         guard let story = story,
               let startingSegment = storyLoader.getStartingSegment(for: story) else { return }
@@ -163,6 +176,10 @@ class StoryReadingViewModel {
 
     func stopAudio() {
         audioService.stop()
+    }
+
+    func dismissBookmarkNotice() {
+        didResumeFromBookmark = false
     }
 
     func togglePlayPause() {

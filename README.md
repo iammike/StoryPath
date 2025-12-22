@@ -13,11 +13,12 @@ StoryPath brings timeless public domain stories to life with branching narrative
 - "Authentic path" indicators showing choices that follow the original story
 - Story restart from any ending
 - VoiceOver accessibility support
+- Text-to-speech narration with play/pause controls
+- Progress tracking with completion percentage
+- Auto-resume from bookmarked position
 
 ## Planned Features
 
-- Audio narration for all story paths
-- Progress tracking and bookmarking
 - Story library with multiple tales
 - AI-generated illustrations
 - In-app purchases for additional stories
@@ -40,7 +41,7 @@ choose-your-own-story/
 │   │   ├── Models/         # Story, StorySegment, StoryChoice
 │   │   ├── Views/          # StoryReadingView
 │   │   ├── ViewModels/     # StoryReadingViewModel
-│   │   ├── Services/       # StoryLoader, StoryRepository
+│   │   ├── Services/       # StoryLoader, StoryRepository, ProgressService, AudioService
 │   │   └── Resources/      # Story JSON content
 │   ├── StoryPathTests/     # Unit tests
 │   └── StoryPath.xcodeproj
