@@ -13,13 +13,13 @@
 ### Features
 
 - [x] Xcode project setup with SwiftUI and SwiftData - Create project structure, configure build settings, set up Git repository `S`
-- [ ] GitHub Actions CI/CD - Setup automated testing that must pass before merging PRs `S`
+- [x] GitHub Actions CI/CD - Setup automated testing that must pass before merging PRs `S`
 - [x] Story data model - Design JSON schema for story structure, decision trees, paths, and metadata `M`
 - [x] Story content parser - Build system to load and parse story JSON into app data structures `M`
-- [ ] Basic story reading UI - Create scrollable story view with text display and navigation `M`
-- [ ] Decision point interface - Interactive choice buttons with branching logic `M`
+- [x] Basic story reading UI - Create scrollable story view with text display and navigation `M`
+- [x] Decision point interface - Interactive choice buttons with branching logic `M`
 - [ ] Audio playback system - AVFoundation integration with play/pause/skip controls `M`
-- [ ] Progress tracking - Track completed paths, current position, and story completion percentage `S`
+- [x] Progress tracking - Track completed paths, current position, and story completion percentage `S`
 - [ ] Bookmark functionality - Save and restore reading position within stories `S`
 - [ ] First complete story - "Little Red Riding Hood" with 3-4 branching paths fully authored and narrated `XL`
 
@@ -95,6 +95,8 @@
 ### Features
 
 - [ ] Achievement system - Badges for path discoveries, story completions, collection milestones `M`
+- [ ] Authentic ending celebration - Confetti/balloons animation when completing the original story path `S`
+- [ ] Page turning animation - Animated transition between story segments `S`
 - [ ] Reading statistics - Time spent reading, favorite stories, paths explored `S`
 - [ ] Audio customization - Narration speed control, voice selection (if multiple available) `M`
 - [ ] Night mode - Dark theme for bedtime reading `S`
