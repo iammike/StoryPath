@@ -35,7 +35,8 @@ class StoryReadingViewModel {
     }
 
     var completionPercentage: Double {
-        progress?.completionPercentage ?? 0.0
+        guard totalPaths > 0 else { return 0.0 }
+        return Double(completedPathsCount) / Double(totalPaths)
     }
 
     init(storyLoader: StoryLoader = .shared, progressService: ProgressService = .shared) {
