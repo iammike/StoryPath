@@ -151,7 +151,9 @@ class StoryReadingViewModel {
         var textToSpeak = segment.text
 
         // Add choices if not at an ending
-        if !segment.choices.isEmpty {
+        if segment.choices.count == 1 {
+            textToSpeak += "\n\nTap continue when you're ready."
+        } else if segment.choices.count > 1 {
             textToSpeak += "\n\nYour choices are: "
             for (index, choice) in segment.choices.enumerated() {
                 textToSpeak += "\(index + 1). \(choice.text). "

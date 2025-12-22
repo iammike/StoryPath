@@ -116,7 +116,6 @@ struct StoryReadingView: View {
                             .font(.custom("Georgia", size: 18))
                             .lineSpacing(6)
                             .padding(.horizontal, 20)
-                            .padding(.top, viewModel.didResumeFromBookmark ? 0 : 20)
                             .id(viewModel.didResumeFromBookmark ? "text" : "top")
 
                         // Choices or ending
@@ -127,6 +126,7 @@ struct StoryReadingView: View {
                         }
                     }
                     .padding(.bottom, 100)
+                    .safeAreaPadding(.top, 40)
                 }
                 .defaultScrollAnchor(.top)
                 .scrollIndicators(.hidden)
@@ -177,41 +177,45 @@ struct StoryReadingView: View {
 
     private func choicesView(_ choices: [StoryChoice]) -> some View {
         VStack(spacing: 12) {
-            Button {
-                viewModel.speakChoices()
-            } label: {
-                Label("Hear choices", systemImage: "speaker.wave.2.fill")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-            }
-            .buttonStyle(.plain)
-            .padding(.bottom, 4)
-
-            ForEach(choices.indices, id: \.self) { index in
-                let choice = choices[index]
+            // Single choice = Continue button, multiple choices = full UI
+            if choices.count == 1, let choice = choices.first {
+                continueButton(choice)
+            } else {
                 Button {
-                    viewModel.selectChoice(choice)
+                    viewModel.speakChoices()
                 } label: {
-                    HStack {
-                        if viewModel.hasUsedAudioForSegment {
-                            Text("\(index + 1).")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundStyle(.secondary)
-                                .frame(width: 24, alignment: .leading)
+                    Label("Hear choices", systemImage: "speaker.wave.2.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, 4)
+
+                ForEach(choices.indices, id: \.self) { index in
+                    let choice = choices[index]
+                    Button {
+                        viewModel.selectChoice(choice)
+                    } label: {
+                        HStack {
+                            if viewModel.hasUsedAudioForSegment {
+                                Text("\(index + 1).")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 24, alignment: .leading)
+                            }
+                            Text(choice.text)
+                                .font(.system(size: 16, weight: .medium))
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                            if choice.isAuthenticPath {
+                                Image(systemName: "book.fill")
+                                    .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+                            }
                         }
-                        Text(choice.text)
-                            .font(.system(size: 16, weight: .medium))
-                            .multilineTextAlignment(.leading)
-                        Spacer()
-                        if choice.isAuthenticPath {
-                            Image(systemName: "book.fill")
-                                .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
-                    .frame(maxWidth: .infinity)
-                    .background(Color(white: 0.95))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                        .frame(maxWidth: .infinity)
+                        .background(Color(white: 0.95))
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(choice.isAuthenticPath ? Color(red: 0.83, green: 0.66, blue: 0.29) : Color.clear, lineWidth: 2)
@@ -222,9 +226,24 @@ struct StoryReadingView: View {
                 .foregroundStyle(.primary)
                 .accessibilityLabel(choice.isAuthenticPath ? "\(choice.text). This follows the original story." : choice.text)
                 .accessibilityHint("Tap to continue the story")
+                }
             }
         }
         .padding(.horizontal, 20)
+    }
+
+    private func continueButton(_ choice: StoryChoice) -> some View {
+        Button {
+            viewModel.selectChoice(choice)
+        } label: {
+            Label("Continue", systemImage: "arrow.right.circle.fill")
+                .font(.system(size: 16, weight: .medium))
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+        }
+        .buttonStyle(.bordered)
+        .tint(Color(red: 0.83, green: 0.66, blue: 0.29))
+        .accessibilityLabel("Continue the story")
     }
 }
 
