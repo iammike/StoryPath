@@ -91,11 +91,20 @@ struct StoryReadingView: View {
     }
 
     private var endingView: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 24) {
             Text("The End")
                 .font(.custom("Georgia", size: 24))
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
+
+            Button {
+                restartStory()
+            } label: {
+                Label("Read Again", systemImage: "arrow.counterclockwise")
+                    .font(.system(size: 16, weight: .medium))
+            }
+            .buttonStyle(.bordered)
+            .accessibilityLabel("Read the story again from the beginning")
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
@@ -129,6 +138,8 @@ struct StoryReadingView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.primary)
+                .accessibilityLabel(choice.isAuthenticPath ? "\(choice.text). This follows the original story." : choice.text)
+                .accessibilityHint("Tap to continue the story")
             }
         }
         .padding(.horizontal, 20)
@@ -157,6 +168,14 @@ struct StoryReadingView: View {
     private func selectChoice(_ choice: StoryChoice) {
         withAnimation(.easeInOut(duration: 0.2)) {
             currentSegmentId = choice.nextSegmentId
+        }
+    }
+
+    private func restartStory() {
+        guard let story = story,
+              let startingSegment = StoryLoader.shared.getStartingSegment(for: story) else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            currentSegmentId = startingSegment.id
         }
     }
 }
