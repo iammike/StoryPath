@@ -21,7 +21,7 @@
 - [x] Audio playback system - Text-to-speech with play/pause controls and premium voice selection `M`
 - [x] Progress tracking - Track completed paths, current position, and story completion percentage `S`
 - [x] Bookmark functionality - Auto-resume with "continuing where you left off" notice `S`
-- [ ] First complete story - "Little Red Riding Hood" with 3-4 branching paths fully authored and narrated `XL`
+- [x] First complete story - "Little Red Riding Hood" with 5 branching paths and TTS narration `XL`
 
 ### Dependencies
 
@@ -99,6 +99,7 @@
 - [ ] Page turning animation - Animated transition between story segments `S`
 - [ ] Reading statistics - Time spent reading, favorite stories, paths explored `S`
 - [ ] Audio customization - Narration speed control, voice selection (if multiple available) `M`
+- [ ] Professional voice narration - Pre-recorded audio narration for stories `L`
 - [ ] Night mode - Dark theme for bedtime reading `S`
 - [ ] Story favorites - Mark and quickly access favorite stories `XS`
 - [ ] Path recommendations - "Haven't tried this path yet" suggestions `S`

@@ -2,6 +2,8 @@
 
 An interactive storytelling app featuring classic fairy tales and folk stories in a choose-your-own-adventure format.
 
+![StoryPath on iPad](images/story-reading-ipad.png)
+
 ## Overview
 
 StoryPath brings timeless public domain stories to life with branching narratives. Each story maintains a path to the original tale while offering creative alternatives for readers to explore.
