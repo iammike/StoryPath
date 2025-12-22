@@ -10,6 +10,9 @@ import AVFoundation
 class AudioService: NSObject {
     static let shared = AudioService()
 
+    /// Slower speech rate for better comprehension by children
+    private static let childrenStoryRateMultiplier: Float = 0.85
+
     private let synthesizer = AVSpeechSynthesizer()
     private(set) var isSpeaking = false
     private(set) var isPaused = false
@@ -38,8 +41,7 @@ class AudioService: NSObject {
         self.onFinished = onFinished
 
         let utterance = AVSpeechUtterance(string: text)
-        // Slightly slower rate improves comprehension for children's story narration
-        utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.85
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate * Self.childrenStoryRateMultiplier
         utterance.pitchMultiplier = 1.0
         utterance.volume = 1.0
         utterance.voice = selectBestVoice()

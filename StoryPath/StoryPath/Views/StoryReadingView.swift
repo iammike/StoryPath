@@ -159,7 +159,8 @@ struct StoryReadingView: View {
             .buttonStyle(.plain)
             .padding(.bottom, 4)
 
-            ForEach(Array(choices.enumerated()), id: \.element.id) { index, choice in
+            ForEach(choices.indices, id: \.self) { index in
+                let choice = choices[index]
                 Button {
                     viewModel.selectChoice(choice)
                 } label: {
