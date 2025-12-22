@@ -28,7 +28,22 @@ struct StoryReadingView: View {
         .ignoresSafeArea()
         .task {
             await viewModel.loadStory(withId: storyId)
+            // Auto-read first segment after loading
+            if viewModel.isAudioEnabled {
+                viewModel.speakCurrentSegment()
+            }
         }
+    }
+
+    private var audioControlButton: some View {
+        Button {
+            viewModel.togglePlayPause()
+        } label: {
+            Image(systemName: viewModel.audioService.isCurrentlyPlaying ? "pause.circle.fill" : "play.circle.fill")
+                .font(.system(size: 44))
+                .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+        }
+        .accessibilityLabel(viewModel.audioService.isCurrentlyPlaying ? "Pause reading" : "Read aloud")
     }
 
     // MARK: - Subviews
@@ -64,31 +79,38 @@ struct StoryReadingView: View {
     }
 
     private func segmentContentView(_ segment: StorySegment) -> some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    // Story text
-                    Text(segment.text)
-                        .font(.custom("Georgia", size: 18))
-                        .lineSpacing(6)
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
-                        .id("top")
+        ZStack(alignment: .bottomTrailing) {
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        // Story text
+                        Text(segment.text)
+                            .font(.custom("Georgia", size: 18))
+                            .lineSpacing(6)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 20)
+                            .id("top")
 
-                    // Choices or ending
-                    if segment.isEnding {
-                        endingView
-                    } else {
-                        choicesView(segment.choices)
+                        // Choices or ending
+                        if segment.isEnding {
+                            endingView
+                        } else {
+                            choicesView(segment.choices)
+                        }
                     }
+                    .padding(.bottom, 100)
                 }
+                .defaultScrollAnchor(.top)
+                .scrollIndicators(.hidden)
+                .onChange(of: viewModel.currentSegmentId) {
+                    proxy.scrollTo("top", anchor: .top)
+                }
+            }
+
+            // Audio control button
+            audioControlButton
+                .padding(.trailing, 20)
                 .padding(.bottom, 40)
-            }
-            .defaultScrollAnchor(.top)
-            .scrollIndicators(.hidden)
-            .onChange(of: viewModel.currentSegmentId) {
-                proxy.scrollTo("top", anchor: .top)
-            }
         }
         .background(Color(white: 0.98))
     }
@@ -127,11 +149,28 @@ struct StoryReadingView: View {
 
     private func choicesView(_ choices: [StoryChoice]) -> some View {
         VStack(spacing: 12) {
-            ForEach(choices) { choice in
+            Button {
+                viewModel.speakChoices()
+            } label: {
+                Label("Hear choices", systemImage: "speaker.wave.2.fill")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+            }
+            .buttonStyle(.plain)
+            .padding(.bottom, 4)
+
+            ForEach(choices.indices, id: \.self) { index in
+                let choice = choices[index]
                 Button {
                     viewModel.selectChoice(choice)
                 } label: {
                     HStack {
+                        if viewModel.hasUsedAudioForSegment {
+                            Text("\(index + 1).")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(.secondary)
+                                .frame(width: 24, alignment: .leading)
+                        }
                         Text(choice.text)
                             .font(.system(size: 16, weight: .medium))
                             .multilineTextAlignment(.leading)
