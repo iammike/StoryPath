@@ -117,7 +117,7 @@ Create the Little Red Riding Hood story JSON file to test the parser with real c
 ---
 
 ## Task 5: Integration & Testing
-**Status**: 🔄 In Progress
+**Status**: ✅ Completed
 **Priority**: High
 **Assignee**: Agent
 
@@ -127,16 +127,16 @@ Verify all components work together and tests pass.
 ### Subtasks
 - [x] 5.1: Run full test suite
 - [x] 5.2: Fix missing Combine import in StoryRepository
-- [ ] 5.3: Add Stories folder to Xcode project as folder reference
-- [ ] 5.4: Verify StoryLoader loads little-red-riding-hood.json
-- [ ] 5.5: Verify validation passes for real story content
-- [ ] 5.6: Address any remaining test failures or warnings
+- [x] 5.3: Add Stories folder to Xcode project as folder reference
+- [x] 5.4: Verify StoryLoader loads little-red-riding-hood.json
+- [x] 5.5: Verify validation passes for real story content
+- [x] 5.6: Address any remaining test failures or warnings
 
 ### Acceptance Criteria
-- All unit tests pass
-- No Swift compiler warnings
-- StoryLoader successfully loads real story content
-- Performance acceptable for expected story count
+- All unit tests pass ✅
+- No Swift compiler warnings ✅
+- StoryLoader successfully loads real story content ✅
+- Performance acceptable for expected story count ✅
 
 ### Files Verified
 - All test files
@@ -144,10 +144,11 @@ Verify all components work together and tests pass.
 - StoryRepository.swift (✅ fixed - added Combine import)
 
 ### Notes
-- Tests compile successfully after adding Combine import
-- Story JSON file exists but needs to be added to Xcode project
-- Tests that load stories from bundle are failing because Resources/Stories folder isn't in the bundle yet
-- This requires manual Xcode project configuration (File > Add Files to "StoryPath" > Add folder reference)
+- All 11 tests pass successfully
+- Project uses PBXFileSystemSynchronizedRootGroup (Xcode 16+) which automatically syncs folder contents
+- Stories folder is properly included in the app bundle
+- StoryLoader successfully loads little-red-riding-hood.json from bundle
+- Validation passes with no warnings on the real story content
 
 ---
 
