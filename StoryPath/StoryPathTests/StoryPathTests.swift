@@ -469,4 +469,48 @@ struct StoryPathTests {
         #expect(viewModel.completedPathsCount == initialCompleted + 1)
     }
 
+    // MARK: - AudioService Tests
+
+    @Test func testAudioServiceInitialState() async throws {
+        let audioService = AudioService()
+
+        #expect(audioService.isSpeaking == false)
+        #expect(audioService.isPaused == false)
+    }
+
+    @Test func testAudioServiceSpeak() async throws {
+        let audioService = AudioService()
+
+        audioService.speak("Hello")
+
+        #expect(audioService.isSpeaking == true)
+        #expect(audioService.isPaused == false)
+
+        audioService.stop()
+
+        #expect(audioService.isSpeaking == false)
+    }
+
+    @Test func testAudioServicePauseResume() async throws {
+        let audioService = AudioService()
+
+        audioService.speak("This is a longer test sentence for pause and resume.")
+
+        #expect(audioService.isSpeaking == true)
+
+        audioService.pause()
+        #expect(audioService.isPaused == true)
+
+        audioService.resume()
+        #expect(audioService.isPaused == false)
+
+        audioService.stop()
+    }
+
+    @Test func testViewModelAudioDefaultsOff() async throws {
+        let viewModel = StoryReadingViewModel()
+
+        #expect(viewModel.isAudioEnabled == false)
+    }
+
 }

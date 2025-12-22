@@ -13,9 +13,11 @@ class StoryReadingViewModel {
     private(set) var isLoading = false
     private(set) var errorMessage: String?
     private(set) var progress: UserProgress?
+    var isAudioEnabled = false
 
     private let storyLoader: StoryLoader
     private let progressService: ProgressService
+    let audioService: AudioService
 
     var currentSegment: StorySegment? {
         guard let story = story, let segmentId = currentSegmentId else { return nil }
@@ -39,9 +41,18 @@ class StoryReadingViewModel {
         return Double(completedPathsCount) / Double(totalPaths)
     }
 
-    init(storyLoader: StoryLoader = .shared, progressService: ProgressService = .shared) {
+    var isSpeaking: Bool {
+        audioService.isSpeaking
+    }
+
+    var isPaused: Bool {
+        audioService.isPaused
+    }
+
+    init(storyLoader: StoryLoader = .shared, progressService: ProgressService = .shared, audioService: AudioService = .shared) {
         self.storyLoader = storyLoader
         self.progressService = progressService
+        self.audioService = audioService
     }
 
     func loadStory(withId storyId: String) async {
@@ -74,6 +85,9 @@ class StoryReadingViewModel {
     }
 
     func selectChoice(_ choice: StoryChoice) {
+        // Stop any current audio
+        audioService.stop()
+
         currentSegmentId = choice.nextSegmentId
 
         // Track progress
@@ -86,9 +100,16 @@ class StoryReadingViewModel {
         }
 
         saveProgress()
+
+        // Auto-read new segment
+        if isAudioEnabled {
+            speakCurrentSegment()
+        }
     }
 
     func restartStory() {
+        audioService.stop()
+
         guard let story = story,
               let startingSegment = storyLoader.getStartingSegment(for: story) else { return }
         currentSegmentId = startingSegment.id
@@ -98,6 +119,30 @@ class StoryReadingViewModel {
         progress?.pathHistory = [startingSegment.id]
 
         saveProgress()
+
+        // Auto-read first segment
+        if isAudioEnabled {
+            speakCurrentSegment()
+        }
+    }
+
+    // MARK: - Audio Controls
+
+    func speakCurrentSegment() {
+        guard let segment = currentSegment else { return }
+        audioService.speak(segment.text)
+    }
+
+    func stopAudio() {
+        audioService.stop()
+    }
+
+    func togglePlayPause() {
+        if !isSpeaking && !isPaused {
+            speakCurrentSegment()
+        } else {
+            audioService.togglePlayPause()
+        }
     }
 
     private func saveProgress() {
