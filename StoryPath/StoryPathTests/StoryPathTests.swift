@@ -317,7 +317,11 @@ struct StoryPathTests {
     }
 
     @Test func testViewModelSelectChoice() async throws {
-        let viewModel = StoryReadingViewModel()
+        let testDefaults = UserDefaults(suiteName: "test-select")!
+        testDefaults.removePersistentDomain(forName: "test-select")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryReadingViewModel(progressService: progressService)
         await viewModel.loadStory(withId: "little-red-riding-hood")
 
         let initialSegmentId = viewModel.currentSegmentId
@@ -336,7 +340,12 @@ struct StoryPathTests {
     }
 
     @Test func testViewModelRestartStory() async throws {
-        let viewModel = StoryReadingViewModel()
+        // Use isolated progress to avoid interference from other tests
+        let testDefaults = UserDefaults(suiteName: "test-restart")!
+        testDefaults.removePersistentDomain(forName: "test-restart")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryReadingViewModel(progressService: progressService)
         await viewModel.loadStory(withId: "little-red-riding-hood")
 
         let startingSegmentId = viewModel.currentSegmentId
@@ -356,7 +365,11 @@ struct StoryPathTests {
     }
 
     @Test func testViewModelIsAtEnding() async throws {
-        let viewModel = StoryReadingViewModel()
+        let testDefaults = UserDefaults(suiteName: "test-ending")!
+        testDefaults.removePersistentDomain(forName: "test-ending")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryReadingViewModel(progressService: progressService)
         await viewModel.loadStory(withId: "little-red-riding-hood")
 
         // Starting segment should not be an ending
@@ -385,6 +398,75 @@ struct StoryPathTests {
         #expect(viewModel.story == nil)
         #expect(viewModel.errorMessage != nil)
         #expect(viewModel.isLoading == false)
+    }
+
+    // MARK: - ProgressService Tests
+
+    @Test func testProgressServiceSaveAndLoad() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-progress")!
+        testDefaults.removePersistentDomain(forName: "test-progress")
+
+        let service = ProgressService(userDefaults: testDefaults)
+        let progress = service.createNewProgress(for: "test-story", startingSegmentId: "start")
+
+        service.saveProgress(progress)
+        let loaded = service.loadProgress(for: "test-story")
+
+        #expect(loaded != nil)
+        #expect(loaded?.storyId == "test-story")
+        #expect(loaded?.currentSegmentId == "start")
+    }
+
+    @Test func testProgressServiceClear() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-progress-clear")!
+        testDefaults.removePersistentDomain(forName: "test-progress-clear")
+
+        let service = ProgressService(userDefaults: testDefaults)
+        let progress = service.createNewProgress(for: "test-story", startingSegmentId: "start")
+
+        service.saveProgress(progress)
+        #expect(service.loadProgress(for: "test-story") != nil)
+
+        service.clearProgress(for: "test-story")
+        #expect(service.loadProgress(for: "test-story") == nil)
+    }
+
+    @Test func testViewModelTracksProgress() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-vm-progress")!
+        testDefaults.removePersistentDomain(forName: "test-vm-progress")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryReadingViewModel(progressService: progressService)
+
+        await viewModel.loadStory(withId: "little-red-riding-hood")
+
+        #expect(viewModel.progress != nil)
+        #expect(viewModel.completedPathsCount == 0)
+        #expect(viewModel.totalPaths > 0)
+    }
+
+    @Test func testViewModelMarksPathComplete() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-vm-complete")!
+        testDefaults.removePersistentDomain(forName: "test-vm-complete")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryReadingViewModel(progressService: progressService)
+
+        await viewModel.loadStory(withId: "little-red-riding-hood")
+
+        let initialCompleted = viewModel.completedPathsCount
+
+        // Navigate to an ending
+        var maxIterations = 20
+        while !viewModel.isAtEnding && maxIterations > 0 {
+            guard let segment = viewModel.currentSegment,
+                  let firstChoice = segment.choices.first else { break }
+            viewModel.selectChoice(firstChoice)
+            maxIterations -= 1
+        }
+
+        #expect(viewModel.isAtEnding)
+        #expect(viewModel.completedPathsCount == initialCompleted + 1)
     }
 
 }

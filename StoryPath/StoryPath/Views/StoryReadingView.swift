@@ -23,6 +23,9 @@ struct StoryReadingView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(white: 0.98))
+        .ignoresSafeArea()
         .task {
             await viewModel.loadStory(withId: storyId)
         }
@@ -61,23 +64,31 @@ struct StoryReadingView: View {
     }
 
     private func segmentContentView(_ segment: StorySegment) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                // Story text
-                Text(segment.text)
-                    .font(.custom("Georgia", size: 18))
-                    .lineSpacing(6)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    // Story text
+                    Text(segment.text)
+                        .font(.custom("Georgia", size: 18))
+                        .lineSpacing(6)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
+                        .id("top")
 
-                // Choices or ending
-                if segment.isEnding {
-                    endingView
-                } else {
-                    choicesView(segment.choices)
+                    // Choices or ending
+                    if segment.isEnding {
+                        endingView
+                    } else {
+                        choicesView(segment.choices)
+                    }
                 }
+                .padding(.bottom, 40)
             }
-            .padding(.bottom, 40)
+            .defaultScrollAnchor(.top)
+            .scrollIndicators(.hidden)
+            .onChange(of: viewModel.currentSegmentId) {
+                proxy.scrollTo("top", anchor: .top)
+            }
         }
         .background(Color(white: 0.98))
     }
@@ -89,10 +100,20 @@ struct StoryReadingView: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
 
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    viewModel.restartStory()
+            if viewModel.totalPaths > 0 {
+                VStack(spacing: 8) {
+                    Text("\(viewModel.completedPathsCount) of \(viewModel.totalPaths) endings discovered")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    ProgressView(value: viewModel.completionPercentage)
+                        .tint(Color(red: 0.83, green: 0.66, blue: 0.29))
+                        .frame(width: 200)
                 }
+            }
+
+            Button {
+                viewModel.restartStory()
             } label: {
                 Label("Read Again", systemImage: "arrow.counterclockwise")
                     .font(.system(size: 16, weight: .medium))
@@ -108,9 +129,7 @@ struct StoryReadingView: View {
         VStack(spacing: 12) {
             ForEach(choices) { choice in
                 Button {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        viewModel.selectChoice(choice)
-                    }
+                    viewModel.selectChoice(choice)
                 } label: {
                     HStack {
                         Text(choice.text)

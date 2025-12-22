@@ -13,5 +13,6 @@ struct StoryPathApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowResizability(.contentSize)
     }
 }
