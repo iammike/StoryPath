@@ -8,23 +8,15 @@ import SwiftUI
 struct StoryReadingView: View {
     let storyId: String
 
-    @State private var story: Story?
-    @State private var currentSegmentId: String?
-    @State private var isLoading = true
-    @State private var errorMessage: String?
-
-    private var currentSegment: StorySegment? {
-        guard let story = story, let segmentId = currentSegmentId else { return nil }
-        return StoryLoader.shared.getSegment(withId: segmentId, in: story)
-    }
+    @State private var viewModel = StoryReadingViewModel()
 
     var body: some View {
         Group {
-            if isLoading {
+            if viewModel.isLoading {
                 loadingView
-            } else if let error = errorMessage {
+            } else if let error = viewModel.errorMessage {
                 errorView(error)
-            } else if let segment = currentSegment {
+            } else if let segment = viewModel.currentSegment {
                 segmentContentView(segment)
             } else {
                 Text("No content available")
@@ -32,7 +24,7 @@ struct StoryReadingView: View {
             }
         }
         .task {
-            await loadStory()
+            await viewModel.loadStory(withId: storyId)
         }
     }
 
@@ -60,7 +52,7 @@ struct StoryReadingView: View {
                 .multilineTextAlignment(.center)
             Button("Try Again") {
                 Task {
-                    await loadStory()
+                    await viewModel.loadStory(withId: storyId)
                 }
             }
             .buttonStyle(.bordered)
@@ -78,7 +70,7 @@ struct StoryReadingView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
 
-                // Choices or ending (placeholder for now)
+                // Choices or ending
                 if segment.isEnding {
                     endingView
                 } else {
@@ -91,11 +83,22 @@ struct StoryReadingView: View {
     }
 
     private var endingView: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 24) {
             Text("The End")
                 .font(.custom("Georgia", size: 24))
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    viewModel.restartStory()
+                }
+            } label: {
+                Label("Read Again", systemImage: "arrow.counterclockwise")
+                    .font(.system(size: 16, weight: .medium))
+            }
+            .buttonStyle(.bordered)
+            .accessibilityLabel("Read the story again from the beginning")
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
@@ -105,7 +108,9 @@ struct StoryReadingView: View {
         VStack(spacing: 12) {
             ForEach(choices) { choice in
                 Button {
-                    selectChoice(choice)
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.selectChoice(choice)
+                    }
                 } label: {
                     HStack {
                         Text(choice.text)
@@ -129,35 +134,11 @@ struct StoryReadingView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.primary)
+                .accessibilityLabel(choice.isAuthenticPath ? "\(choice.text). This follows the original story." : choice.text)
+                .accessibilityHint("Tap to continue the story")
             }
         }
         .padding(.horizontal, 20)
-    }
-
-    // MARK: - Actions
-
-    private func loadStory() async {
-        isLoading = true
-        errorMessage = nil
-
-        do {
-            let loadedStory = try await StoryLoader.shared.loadStory(withId: storyId)
-            story = loadedStory
-
-            if let startingSegment = StoryLoader.shared.getStartingSegment(for: loadedStory) {
-                currentSegmentId = startingSegment.id
-            }
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-
-        isLoading = false
-    }
-
-    private func selectChoice(_ choice: StoryChoice) {
-        withAnimation(.easeInOut(duration: 0.2)) {
-            currentSegmentId = choice.nextSegmentId
-        }
     }
 }
 

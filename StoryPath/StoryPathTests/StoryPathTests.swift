@@ -298,4 +298,93 @@ struct StoryPathTests {
         }
     }
 
+    // MARK: - StoryReadingViewModel Tests
+
+    @Test func testViewModelLoadStory() async throws {
+        let viewModel = StoryReadingViewModel()
+
+        #expect(viewModel.story == nil)
+        #expect(viewModel.currentSegmentId == nil)
+        #expect(viewModel.isLoading == false)
+
+        await viewModel.loadStory(withId: "little-red-riding-hood")
+
+        #expect(viewModel.story != nil)
+        #expect(viewModel.currentSegmentId != nil)
+        #expect(viewModel.isLoading == false)
+        #expect(viewModel.errorMessage == nil)
+        #expect(viewModel.currentSegment != nil)
+    }
+
+    @Test func testViewModelSelectChoice() async throws {
+        let viewModel = StoryReadingViewModel()
+        await viewModel.loadStory(withId: "little-red-riding-hood")
+
+        let initialSegmentId = viewModel.currentSegmentId
+        #expect(initialSegmentId != nil)
+
+        guard let segment = viewModel.currentSegment,
+              let firstChoice = segment.choices.first else {
+            Issue.record("No choices available in starting segment")
+            return
+        }
+
+        viewModel.selectChoice(firstChoice)
+
+        #expect(viewModel.currentSegmentId == firstChoice.nextSegmentId)
+        #expect(viewModel.currentSegmentId != initialSegmentId)
+    }
+
+    @Test func testViewModelRestartStory() async throws {
+        let viewModel = StoryReadingViewModel()
+        await viewModel.loadStory(withId: "little-red-riding-hood")
+
+        let startingSegmentId = viewModel.currentSegmentId
+        #expect(startingSegmentId != nil)
+
+        // Navigate to a different segment
+        if let segment = viewModel.currentSegment,
+           let firstChoice = segment.choices.first {
+            viewModel.selectChoice(firstChoice)
+            #expect(viewModel.currentSegmentId != startingSegmentId)
+        }
+
+        // Restart and verify we're back at the beginning
+        viewModel.restartStory()
+
+        #expect(viewModel.currentSegmentId == startingSegmentId)
+    }
+
+    @Test func testViewModelIsAtEnding() async throws {
+        let viewModel = StoryReadingViewModel()
+        await viewModel.loadStory(withId: "little-red-riding-hood")
+
+        // Starting segment should not be an ending
+        #expect(viewModel.isAtEnding == false)
+
+        // Navigate through choices until we reach an ending
+        var maxIterations = 20
+        while !viewModel.isAtEnding && maxIterations > 0 {
+            guard let segment = viewModel.currentSegment,
+                  let firstChoice = segment.choices.first else {
+                break
+            }
+            viewModel.selectChoice(firstChoice)
+            maxIterations -= 1
+        }
+
+        #expect(viewModel.isAtEnding == true)
+        #expect(viewModel.currentSegment?.isEnding == true)
+    }
+
+    @Test func testViewModelLoadInvalidStory() async throws {
+        let viewModel = StoryReadingViewModel()
+
+        await viewModel.loadStory(withId: "nonexistent-story-id")
+
+        #expect(viewModel.story == nil)
+        #expect(viewModel.errorMessage != nil)
+        #expect(viewModel.isLoading == false)
+    }
+
 }
