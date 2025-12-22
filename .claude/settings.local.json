@@ -14,7 +14,9 @@
       "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Build/Intermediates.noindex/**)",
       "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/StoryPath-hbhvpalkhkqotpfcctbfjlatgsgd/Build/**)",
       "Bash(find:*)",
-      "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/**)"
+      "Read(//Users/michaelcollins/Library/Developer/Xcode/DerivedData/**)",
+      "Bash(git stash show:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

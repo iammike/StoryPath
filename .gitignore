@@ -32,3 +32,6 @@ Pods/
 # Agent OS
 .agent-os/cache/
 .agent-os/temp/
+
+# Claude Code
+.claude/
