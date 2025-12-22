@@ -147,18 +147,22 @@ class StoryReadingViewModel {
         guard let segment = currentSegment else { return }
 
         hasUsedAudioForSegment = true
+        audioService.speak(speechText(for: segment))
+    }
 
-        var textToSpeak = segment.text
+    func speechText(for segment: StorySegment) -> String {
+        var text = segment.text
 
-        // Add choices if not at an ending
-        if !segment.choices.isEmpty {
-            textToSpeak += "\n\nYour choices are: "
+        if segment.choices.count == 1 {
+            text += "\n\nTap continue when you're ready."
+        } else if segment.choices.count > 1 {
+            text += "\n\nYour choices are: "
             for (index, choice) in segment.choices.enumerated() {
-                textToSpeak += "\(index + 1). \(choice.text). "
+                text += "\(index + 1). \(choice.text). "
             }
         }
 
-        audioService.speak(textToSpeak)
+        return text
     }
 
     func speakChoices() {
