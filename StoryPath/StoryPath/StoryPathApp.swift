@@ -12,6 +12,7 @@ struct StoryPathApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.light)
         }
         .windowResizability(.contentSize)
     }
