@@ -604,4 +604,67 @@ struct StoryPathTests {
         #expect(viewModel2.isAtStart == true)
     }
 
+    // MARK: - Speech Text Generation Tests
+
+    @Test func testSpeechTextForSingleChoice() async throws {
+        let segment = StorySegment(
+            id: "test",
+            text: "Story text here.",
+            audioFileName: nil,
+            imageFileName: nil,
+            isAuthenticPath: true,
+            choices: [
+                StoryChoice(id: "c1", text: "Continue", nextSegmentId: "next", isAuthenticPath: true)
+            ]
+        )
+
+        let viewModel = StoryReadingViewModel()
+        let speechText = viewModel.speechText(for: segment)
+
+        #expect(speechText.contains("Story text here."))
+        #expect(speechText.contains("Tap continue when you're ready."))
+        #expect(!speechText.contains("Your choices are:"))
+    }
+
+    @Test func testSpeechTextForMultipleChoices() async throws {
+        let segment = StorySegment(
+            id: "test",
+            text: "Story text here.",
+            audioFileName: nil,
+            imageFileName: nil,
+            isAuthenticPath: true,
+            choices: [
+                StoryChoice(id: "c1", text: "Go left", nextSegmentId: "left", isAuthenticPath: true),
+                StoryChoice(id: "c2", text: "Go right", nextSegmentId: "right", isAuthenticPath: false)
+            ]
+        )
+
+        let viewModel = StoryReadingViewModel()
+        let speechText = viewModel.speechText(for: segment)
+
+        #expect(speechText.contains("Story text here."))
+        #expect(speechText.contains("Your choices are:"))
+        #expect(speechText.contains("1. Go left."))
+        #expect(speechText.contains("2. Go right."))
+        #expect(!speechText.contains("Tap continue"))
+    }
+
+    @Test func testSpeechTextForEnding() async throws {
+        let segment = StorySegment(
+            id: "test",
+            text: "The end of the story.",
+            audioFileName: nil,
+            imageFileName: nil,
+            isAuthenticPath: true,
+            choices: []
+        )
+
+        let viewModel = StoryReadingViewModel()
+        let speechText = viewModel.speechText(for: segment)
+
+        #expect(speechText == "The end of the story.")
+        #expect(!speechText.contains("Your choices are:"))
+        #expect(!speechText.contains("Tap continue"))
+    }
+
 }
