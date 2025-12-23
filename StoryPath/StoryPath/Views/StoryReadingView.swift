@@ -158,6 +158,18 @@ struct StoryReadingView: View {
         }
     }
 
+    @ViewBuilder
+    private func illustrationView(for segment: StorySegment) -> some View {
+        if let imageName = segment.imageFileName {
+            Image(imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal, 20)
+        }
+    }
+
     private func segmentContentView(_ segment: StorySegment) -> some View {
         ZStack(alignment: .bottomTrailing) {
             VStack(spacing: 0) {
@@ -172,6 +184,9 @@ struct StoryReadingView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
+                            // Illustration
+                            illustrationView(for: segment)
+
                             // Story text
                             Text(segment.text)
                                 .font(.custom("Georgia", size: 18))
