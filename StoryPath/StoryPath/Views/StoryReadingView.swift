@@ -4,11 +4,60 @@
 //
 
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct StoryReadingView: View {
     let storyId: String
 
     @State private var viewModel = StoryReadingViewModel()
+    #if os(iOS)
+    @State private var orientation: UIDeviceOrientation = {
+        let current = UIDevice.current.orientation
+        if current.isValidInterfaceOrientation {
+            return current
+        }
+        let isLandscapeByBounds = UIScreen.main.bounds.width > UIScreen.main.bounds.height
+        return isLandscapeByBounds ? .landscapeLeft : .portrait
+    }()
+    #endif
+
+    private enum LayoutConstants {
+        // Safe area top padding by device/orientation
+        static let iPadLandscapeTopPadding: CGFloat = 20
+        static let iPadPortraitTopPadding: CGFloat = 10
+        static let iPhoneLandscapeTopPadding: CGFloat = 11
+        static let iPhonePortraitTopPadding: CGFloat = 9
+        static let defaultTopPadding: CGFloat = 10
+
+        // Content padding
+        static let contentTopPadding: CGFloat = 12
+        static let contentBottomPadding: CGFloat = 100
+
+        // Banner padding
+        static let bannerHorizontalPadding: CGFloat = 16
+        static let bannerTopPadding: CGFloat = 10
+        static let bannerBottomPadding: CGFloat = 14
+    }
+
+    private var topPadding: CGFloat {
+        #if os(iOS)
+        let isLandscape: Bool
+        if orientation.isValidInterfaceOrientation {
+            isLandscape = orientation.isLandscape
+        } else {
+            isLandscape = UIScreen.main.bounds.width > UIScreen.main.bounds.height
+        }
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return isLandscape ? LayoutConstants.iPadLandscapeTopPadding : LayoutConstants.iPadPortraitTopPadding
+        } else {
+            return isLandscape ? LayoutConstants.iPhoneLandscapeTopPadding : LayoutConstants.iPhonePortraitTopPadding
+        }
+        #else
+        return LayoutConstants.defaultTopPadding
+        #endif
+    }
 
     var body: some View {
         Group {
@@ -33,6 +82,14 @@ struct StoryReadingView: View {
                 viewModel.speakCurrentSegment()
             }
         }
+        #if os(iOS)
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            let newOrientation = UIDevice.current.orientation
+            if newOrientation.isValidInterfaceOrientation {
+                orientation = newOrientation
+            }
+        }
+        #endif
     }
 
     private var audioControlButton: some View {
@@ -82,7 +139,7 @@ struct StoryReadingView: View {
         HStack {
             Image(systemName: "bookmark.fill")
                 .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-            Text("Continuing where you left off")
+            Text("Resuming story")
                 .font(.subheadline)
             Spacer()
             Button("Start Over") {
@@ -92,9 +149,9 @@ struct StoryReadingView: View {
             .font(.subheadline.weight(.medium))
             .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity)
+        .padding(.horizontal, LayoutConstants.bannerHorizontalPadding)
+        .padding(.top, LayoutConstants.bannerTopPadding)
+        .padding(.bottom, LayoutConstants.bannerBottomPadding)
         .background(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.15))
         .onTapGesture {
             viewModel.dismissBookmarkNotice()
@@ -108,7 +165,8 @@ struct StoryReadingView: View {
                 if viewModel.didResumeFromBookmark {
                     resumeBanner
                         .transition(.move(edge: .top).combined(with: .opacity))
-                        .safeAreaPadding([.top, .horizontal])
+                        .safeAreaPadding(.top, topPadding)
+                        .safeAreaPadding(.horizontal)
                 }
 
                 ScrollViewReader { proxy in
@@ -128,8 +186,9 @@ struct StoryReadingView: View {
                                 choicesView(segment.choices)
                             }
                         }
-                        .padding(.bottom, 100)
-                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 16 : 40)
+                        .padding(.bottom, LayoutConstants.contentBottomPadding)
+                        .padding(.top, LayoutConstants.contentTopPadding)
+                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 0 : topPadding)
                     }
                     .defaultScrollAnchor(.top)
                     .scrollIndicators(.hidden)

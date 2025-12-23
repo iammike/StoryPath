@@ -138,3 +138,23 @@
 - Sustainable content creation pipeline (AI-assisted workflows)
 - Localization partners for translation
 - Content moderation system if UGC explored
+
+## Phase 6: Platform Expansion
+
+**Goal:** Bring StoryPath to more platforms and users
+
+**Success Criteria:**
+- Feature parity across platforms
+- Consistent story experience
+- Shared content pipeline
+
+### Features
+
+- [ ] Android port - Kotlin/Compose for phones, tablets, Fire tablets, Fire TV, Google TV `XL`
+- [ ] Web app - Browser-based version for universal access `L`
+- [ ] Apple TV app - tvOS app for Apple ecosystem families `M`
+
+### Dependencies
+
+- Android/Android TV development expertise
+- Web framework selection (React, Vue, etc.)
