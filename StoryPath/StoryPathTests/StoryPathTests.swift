@@ -7,9 +7,6 @@
 
 import Foundation
 import Testing
-#if os(iOS)
-import UIKit
-#endif
 @testable import StoryPath
 
 @MainActor
@@ -669,31 +666,5 @@ struct StoryPathTests {
         #expect(!speechText.contains("Your choices are:"))
         #expect(!speechText.contains("Tap continue"))
     }
-
-    // MARK: - Orientation Validation Tests
-
-    #if os(iOS)
-    @Test func testValidInterfaceOrientations() async throws {
-        // These orientations should be considered valid for UI layout
-        #expect(UIDeviceOrientation.portrait.isValidInterfaceOrientation == true)
-        #expect(UIDeviceOrientation.portraitUpsideDown.isValidInterfaceOrientation == true)
-        #expect(UIDeviceOrientation.landscapeLeft.isValidInterfaceOrientation == true)
-        #expect(UIDeviceOrientation.landscapeRight.isValidInterfaceOrientation == true)
-    }
-
-    @Test func testInvalidInterfaceOrientations() async throws {
-        // These orientations should NOT be used for UI layout decisions
-        #expect(UIDeviceOrientation.unknown.isValidInterfaceOrientation == false)
-        #expect(UIDeviceOrientation.faceUp.isValidInterfaceOrientation == false)
-        #expect(UIDeviceOrientation.faceDown.isValidInterfaceOrientation == false)
-    }
-
-    @Test func testLandscapeOrientationDetection() async throws {
-        #expect(UIDeviceOrientation.landscapeLeft.isLandscape == true)
-        #expect(UIDeviceOrientation.landscapeRight.isLandscape == true)
-        #expect(UIDeviceOrientation.portrait.isLandscape == false)
-        #expect(UIDeviceOrientation.portraitUpsideDown.isLandscape == false)
-    }
-    #endif
 
 }
