@@ -24,13 +24,21 @@ struct StoryReadingView: View {
     #endif
 
     private enum LayoutConstants {
+        // Safe area top padding by device/orientation
         static let iPadLandscapeTopPadding: CGFloat = 20
         static let iPadPortraitTopPadding: CGFloat = 10
         static let iPhoneLandscapeTopPadding: CGFloat = 11
         static let iPhonePortraitTopPadding: CGFloat = 9
         static let defaultTopPadding: CGFloat = 10
+
+        // Content padding
         static let contentTopPadding: CGFloat = 12
         static let contentBottomPadding: CGFloat = 100
+
+        // Banner padding
+        static let bannerHorizontalPadding: CGFloat = 16
+        static let bannerTopPadding: CGFloat = 10
+        static let bannerBottomPadding: CGFloat = 14
     }
 
     private var topPadding: CGFloat {
@@ -138,9 +146,9 @@ struct StoryReadingView: View {
             .font(.subheadline.weight(.medium))
             .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 10)
-        .padding(.bottom, 14)
+        .padding(.horizontal, LayoutConstants.bannerHorizontalPadding)
+        .padding(.top, LayoutConstants.bannerTopPadding)
+        .padding(.bottom, LayoutConstants.bannerBottomPadding)
         .background(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.15))
         .onTapGesture {
             viewModel.dismissBookmarkNotice()
