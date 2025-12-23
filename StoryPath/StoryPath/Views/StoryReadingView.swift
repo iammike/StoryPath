@@ -84,7 +84,10 @@ struct StoryReadingView: View {
         }
         #if os(iOS)
         .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-            orientation = UIDevice.current.orientation
+            let newOrientation = UIDevice.current.orientation
+            if newOrientation.isValidInterfaceOrientation {
+                orientation = newOrientation
+            }
         }
         #endif
     }
