@@ -29,6 +29,7 @@ struct StoryReadingView: View {
         static let iPhoneLandscapeTopPadding: CGFloat = 11
         static let iPhonePortraitTopPadding: CGFloat = 9
         static let defaultTopPadding: CGFloat = 10
+        static let contentTopPadding: CGFloat = 12
     }
 
     private var topPadding: CGFloat {
@@ -152,7 +153,8 @@ struct StoryReadingView: View {
                 if viewModel.didResumeFromBookmark {
                     resumeBanner
                         .transition(.move(edge: .top).combined(with: .opacity))
-                        .safeAreaPadding([.top, .horizontal])
+                        .safeAreaPadding(.top, topPadding)
+                        .safeAreaPadding(.horizontal)
                 }
 
                 ScrollViewReader { proxy in
@@ -173,7 +175,8 @@ struct StoryReadingView: View {
                             }
                         }
                         .padding(.bottom, 100)
-                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 16 : topPadding)
+                        .padding(.top, LayoutConstants.contentTopPadding)
+                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 0 : topPadding)
                     }
                     .defaultScrollAnchor(.top)
                     .scrollIndicators(.hidden)
