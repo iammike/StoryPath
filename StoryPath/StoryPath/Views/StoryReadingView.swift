@@ -219,7 +219,7 @@ struct StoryReadingView: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 32))
-                            .foregroundStyle(.white.opacity(0.8))
+                            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
                     }
                     .padding(20)
                     .accessibilityLabel("Close full screen image")
