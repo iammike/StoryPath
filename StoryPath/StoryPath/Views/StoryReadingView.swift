@@ -6,6 +6,8 @@
 import SwiftUI
 #if os(iOS)
 import UIKit
+#else
+import AppKit
 #endif
 
 struct StoryReadingView: View {
@@ -165,15 +167,22 @@ struct StoryReadingView: View {
         }
     }
 
+    private func hasValidImage(for segment: StorySegment) -> Bool {
+        guard let imageName = segment.imageFileName else { return false }
+        #if os(iOS)
+        return UIImage(named: imageName) != nil
+        #else
+        return NSImage(named: imageName) != nil
+        #endif
+    }
+
     @ViewBuilder
     private func illustrationView(for segment: StorySegment) -> some View {
-        if let imageName = segment.imageFileName {
+        if hasValidImage(for: segment), let imageName = segment.imageFileName {
             Image(imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(maxWidth: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding(.horizontal, 20)
                 .onTapGesture {
                     withAnimation(.easeInOut(duration: 0.25)) {
                         fullscreenImage = imageName
@@ -236,13 +245,14 @@ struct StoryReadingView: View {
                         VStack(alignment: .leading, spacing: 24) {
                             // Illustration
                             illustrationView(for: segment)
+                                .id(hasValidImage(for: segment) ? "top" : nil)
 
                             // Story text
                             Text(segment.text)
                                 .font(.custom("Georgia", size: 18))
                                 .lineSpacing(6)
                                 .padding(.horizontal, 20)
-                                .id("top")
+                                .id(hasValidImage(for: segment) ? nil : "top")
 
                             // Choices or ending
                             if segment.isEnding {
@@ -252,8 +262,8 @@ struct StoryReadingView: View {
                             }
                         }
                         .padding(.bottom, LayoutConstants.contentBottomPadding)
-                        .padding(.top, LayoutConstants.contentTopPadding)
-                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 0 : topPadding)
+                        .padding(.top, hasValidImage(for: segment) ? 0 : LayoutConstants.contentTopPadding)
+                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark || hasValidImage(for: segment) ? 0 : topPadding)
                     }
                     .defaultScrollAnchor(.top)
                     .scrollIndicators(.hidden)

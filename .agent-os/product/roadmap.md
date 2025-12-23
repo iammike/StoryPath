@@ -42,6 +42,7 @@
 
 - [ ] Story library home screen - Grid/list view of available stories with cover art `M`
 - [ ] Story detail/preview screen - Synopsis, sample illustration, estimated reading time, path count `S`
+- [ ] Story provenance metadata - Original author, publication year, cultural origin, historical context `S`
 - [ ] Story progress indicators - Visual badges showing completed paths and overall progress `S`
 - [ ] Story collections/categories - Group stories by culture, theme, or collection (Grimm, Aesop, etc.) `M`
 - [ ] Additional stories authored - 4-6 more classic tales with branching narratives and audio `XL`
@@ -106,6 +107,7 @@
 - [ ] Path recommendations - "Haven't tried this path yet" suggestions `S`
 - [ ] Back button navigation - Navigate backwards through selected story path `M`
 - [ ] Illustration gallery - Unlock and view collected artwork `M`
+- [ ] Art style selection - Choose illustration style per story (Classic Fairytale, Soft Watercolor, Bold Graphic, etc.) `L`
 - [ ] Expanded story library - 10+ additional stories across diverse cultures `XL`
 
 ### Dependencies
