@@ -108,8 +108,7 @@ struct StoryReadingView: View {
                 if viewModel.didResumeFromBookmark {
                     resumeBanner
                         .transition(.move(edge: .top).combined(with: .opacity))
-                        .safeAreaPadding(.top)
-                        .safeAreaPadding(.horizontal)
+                        .safeAreaPadding([.top, .horizontal])
                 }
 
                 ScrollViewReader { proxy in
