@@ -71,6 +71,7 @@
 - [ ] Parental gate - Simple math problem or pattern before purchases `S`
 - [ ] Top navigation bar - Controls, settings access, navigation options `M`
 - [ ] Settings screen - Audio preferences, text size, app info, restore purchases `S`
+- [ ] Customizable fonts and color schemes - Preselected fonts, color themes, dark mode support `M`
 - [ ] Onboarding flow - Welcome screens explaining app features and value `M`
 - [ ] App icon and launch screen - Professional branding assets `S`
 - [ ] Accessibility improvements - VoiceOver support, Dynamic Type, contrast modes `L`
@@ -101,7 +102,6 @@
 - [ ] Reading statistics - Time spent reading, favorite stories, paths explored `S`
 - [ ] Audio customization - Narration speed control, voice selection (if multiple available) `M`
 - [ ] Professional voice narration - Pre-recorded audio narration for stories `L`
-- [ ] Night mode - Dark theme for bedtime reading `S`
 - [ ] Story favorites - Mark and quickly access favorite stories `XS`
 - [ ] Path recommendations - "Haven't tried this path yet" suggestions `S`
 - [ ] Back button navigation - Navigate backwards through selected story path `M`
