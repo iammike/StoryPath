@@ -94,6 +94,7 @@ struct StoryReadingView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
         .background(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.15))
         .onTapGesture {
             viewModel.dismissBookmarkNotice()
@@ -102,38 +103,42 @@ struct StoryReadingView: View {
 
     private func segmentContentView(_ segment: StorySegment) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        // Resume banner
-                        if viewModel.didResumeFromBookmark {
-                            resumeBanner
-                                .id("top")
-                        }
-
-                        // Story text
-                        Text(segment.text)
-                            .font(.custom("Georgia", size: 18))
-                            .lineSpacing(6)
-                            .padding(.horizontal, 20)
-                            .id(viewModel.didResumeFromBookmark ? "text" : "top")
-
-                        // Choices or ending
-                        if segment.isEnding {
-                            endingView
-                        } else {
-                            choicesView(segment.choices)
-                        }
-                    }
-                    .padding(.bottom, 100)
-                    .safeAreaPadding(.top, 40)
+            VStack(spacing: 0) {
+                // Resume banner outside scroll view for proper positioning
+                if viewModel.didResumeFromBookmark {
+                    resumeBanner
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .safeAreaPadding([.top, .horizontal])
                 }
-                .defaultScrollAnchor(.top)
-                .scrollIndicators(.hidden)
-                .onChange(of: viewModel.currentSegmentId) {
-                    proxy.scrollTo("top", anchor: .top)
+
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 24) {
+                            // Story text
+                            Text(segment.text)
+                                .font(.custom("Georgia", size: 18))
+                                .lineSpacing(6)
+                                .padding(.horizontal, 20)
+                                .id("top")
+
+                            // Choices or ending
+                            if segment.isEnding {
+                                endingView
+                            } else {
+                                choicesView(segment.choices)
+                            }
+                        }
+                        .padding(.bottom, 100)
+                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 16 : 40)
+                    }
+                    .defaultScrollAnchor(.top)
+                    .scrollIndicators(.hidden)
+                    .onChange(of: viewModel.currentSegmentId) {
+                        proxy.scrollTo("top", anchor: .top)
+                    }
                 }
             }
+            .animation(.easeInOut(duration: 0.3), value: viewModel.didResumeFromBookmark)
 
             // Audio control button
             audioControlButton
