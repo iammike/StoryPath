@@ -30,6 +30,7 @@ struct StoryReadingView: View {
         static let iPhonePortraitTopPadding: CGFloat = 9
         static let defaultTopPadding: CGFloat = 10
         static let contentTopPadding: CGFloat = 12
+        static let contentBottomPadding: CGFloat = 100
     }
 
     private var topPadding: CGFloat {
@@ -174,7 +175,7 @@ struct StoryReadingView: View {
                                 choicesView(segment.choices)
                             }
                         }
-                        .padding(.bottom, 100)
+                        .padding(.bottom, LayoutConstants.contentBottomPadding)
                         .padding(.top, LayoutConstants.contentTopPadding)
                         .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 0 : topPadding)
                     }
