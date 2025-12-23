@@ -69,6 +69,7 @@
 - [ ] Story unlock system - Lock/unlock stories based on purchases `M`
 - [ ] Purchase UI - Story bundle browsing, pricing display, purchase confirmation `M`
 - [ ] Parental gate - Simple math problem or pattern before purchases `S`
+- [ ] Top navigation bar - Controls, settings access, navigation options `M`
 - [ ] Settings screen - Audio preferences, text size, app info, restore purchases `S`
 - [ ] Onboarding flow - Welcome screens explaining app features and value `M`
 - [ ] App icon and launch screen - Professional branding assets `S`
@@ -103,6 +104,7 @@
 - [ ] Night mode - Dark theme for bedtime reading `S`
 - [ ] Story favorites - Mark and quickly access favorite stories `XS`
 - [ ] Path recommendations - "Haven't tried this path yet" suggestions `S`
+- [ ] Back button navigation - Navigate backwards through selected story path `M`
 - [ ] Illustration gallery - Unlock and view collected artwork `M`
 - [ ] Expanded story library - 10+ additional stories across diverse cultures `XL`
 
