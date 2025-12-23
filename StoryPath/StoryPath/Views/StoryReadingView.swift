@@ -4,11 +4,50 @@
 //
 
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct StoryReadingView: View {
     let storyId: String
 
     @State private var viewModel = StoryReadingViewModel()
+    #if os(iOS)
+    @State private var orientation: UIDeviceOrientation = {
+        let current = UIDevice.current.orientation
+        if current.isValidInterfaceOrientation {
+            return current
+        }
+        let isLandscapeByBounds = UIScreen.main.bounds.width > UIScreen.main.bounds.height
+        return isLandscapeByBounds ? .landscapeLeft : .portrait
+    }()
+    #endif
+
+    private enum LayoutConstants {
+        static let iPadLandscapeTopPadding: CGFloat = 20
+        static let iPadPortraitTopPadding: CGFloat = 10
+        static let iPhoneLandscapeTopPadding: CGFloat = 11
+        static let iPhonePortraitTopPadding: CGFloat = 9
+        static let defaultTopPadding: CGFloat = 10
+    }
+
+    private var topPadding: CGFloat {
+        #if os(iOS)
+        let isLandscape: Bool
+        if orientation.isValidInterfaceOrientation {
+            isLandscape = orientation.isLandscape
+        } else {
+            isLandscape = UIScreen.main.bounds.width > UIScreen.main.bounds.height
+        }
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return isLandscape ? LayoutConstants.iPadLandscapeTopPadding : LayoutConstants.iPadPortraitTopPadding
+        } else {
+            return isLandscape ? LayoutConstants.iPhoneLandscapeTopPadding : LayoutConstants.iPhonePortraitTopPadding
+        }
+        #else
+        return LayoutConstants.defaultTopPadding
+        #endif
+    }
 
     var body: some View {
         Group {
@@ -33,6 +72,11 @@ struct StoryReadingView: View {
                 viewModel.speakCurrentSegment()
             }
         }
+        #if os(iOS)
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            orientation = UIDevice.current.orientation
+        }
+        #endif
     }
 
     private var audioControlButton: some View {
@@ -82,7 +126,7 @@ struct StoryReadingView: View {
         HStack {
             Image(systemName: "bookmark.fill")
                 .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-            Text("Continuing where you left off")
+            Text("Resuming story")
                 .font(.subheadline)
             Spacer()
             Button("Start Over") {
@@ -93,8 +137,8 @@ struct StoryReadingView: View {
             .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity)
+        .padding(.top, 10)
+        .padding(.bottom, 14)
         .background(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.15))
         .onTapGesture {
             viewModel.dismissBookmarkNotice()
@@ -129,7 +173,7 @@ struct StoryReadingView: View {
                             }
                         }
                         .padding(.bottom, 100)
-                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 16 : 40)
+                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 16 : topPadding)
                     }
                     .defaultScrollAnchor(.top)
                     .scrollIndicators(.hidden)
