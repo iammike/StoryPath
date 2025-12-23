@@ -6,12 +6,15 @@
 import SwiftUI
 #if os(iOS)
 import UIKit
+#else
+import AppKit
 #endif
 
 struct StoryReadingView: View {
     let storyId: String
 
     @State private var viewModel = StoryReadingViewModel()
+    @State private var fullscreenImage: String?
     #if os(iOS)
     @State private var orientation: UIDeviceOrientation = {
         let current = UIDevice.current.orientation
@@ -75,6 +78,12 @@ struct StoryReadingView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(white: 0.98))
         .ignoresSafeArea()
+        .overlay {
+            if fullscreenImage != nil {
+                fullscreenImageOverlay
+                    .transition(.opacity)
+            }
+        }
         .task {
             await viewModel.loadStory(withId: storyId)
             // Auto-read first segment after loading
@@ -158,6 +167,68 @@ struct StoryReadingView: View {
         }
     }
 
+    private func hasValidImage(for segment: StorySegment) -> Bool {
+        guard let imageName = segment.imageFileName else { return false }
+        #if os(iOS)
+        return UIImage(named: imageName) != nil
+        #else
+        return NSImage(named: imageName) != nil
+        #endif
+    }
+
+    @ViewBuilder
+    private func illustrationView(for segment: StorySegment) -> some View {
+        if hasValidImage(for: segment), let imageName = segment.imageFileName {
+            Image(imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: .infinity)
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        fullscreenImage = imageName
+                    }
+                }
+                .accessibilityHint("Tap to view full screen")
+        }
+    }
+
+    private var fullscreenImageOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.9)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        fullscreenImage = nil
+                    }
+                }
+
+            if let imageName = fullscreenImage {
+                Image(imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .padding(20)
+            }
+
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            fullscreenImage = nil
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 32))
+                            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+                    }
+                    .padding(20)
+                    .accessibilityLabel("Close full screen image")
+                }
+                Spacer()
+            }
+        }
+    }
+
     private func segmentContentView(_ segment: StorySegment) -> some View {
         ZStack(alignment: .bottomTrailing) {
             VStack(spacing: 0) {
@@ -172,12 +243,16 @@ struct StoryReadingView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
+                            // Illustration
+                            illustrationView(for: segment)
+                                .id(hasValidImage(for: segment) ? "top" : nil)
+
                             // Story text
                             Text(segment.text)
                                 .font(.custom("Georgia", size: 18))
                                 .lineSpacing(6)
                                 .padding(.horizontal, 20)
-                                .id("top")
+                                .id(hasValidImage(for: segment) ? nil : "top")
 
                             // Choices or ending
                             if segment.isEnding {
@@ -187,8 +262,8 @@ struct StoryReadingView: View {
                             }
                         }
                         .padding(.bottom, LayoutConstants.contentBottomPadding)
-                        .padding(.top, LayoutConstants.contentTopPadding)
-                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 0 : topPadding)
+                        .padding(.top, hasValidImage(for: segment) ? 0 : LayoutConstants.contentTopPadding)
+                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark || hasValidImage(for: segment) ? 0 : topPadding)
                     }
                     .defaultScrollAnchor(.top)
                     .scrollIndicators(.hidden)

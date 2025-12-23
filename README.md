@@ -18,11 +18,11 @@ StoryPath brings timeless public domain stories to life with branching narrative
 - Text-to-speech narration with play/pause controls
 - Progress tracking with completion percentage
 - Auto-resume from bookmarked position
+- Story illustrations with fullscreen lightbox view
 
 ## Planned Features
 
 - Story library with multiple tales
-- AI-generated illustrations
 - In-app purchases for additional stories
 
 ## Tech Stack
