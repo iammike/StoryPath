@@ -12,6 +12,7 @@ struct StoryReadingView: View {
     let storyId: String
 
     @State private var viewModel = StoryReadingViewModel()
+    @State private var fullscreenImage: String?
     #if os(iOS)
     @State private var orientation: UIDeviceOrientation = {
         let current = UIDevice.current.orientation
@@ -75,6 +76,12 @@ struct StoryReadingView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(white: 0.98))
         .ignoresSafeArea()
+        .overlay {
+            if fullscreenImage != nil {
+                fullscreenImageOverlay
+                    .transition(.opacity)
+            }
+        }
         .task {
             await viewModel.loadStory(withId: storyId)
             // Auto-read first segment after loading
@@ -167,6 +174,49 @@ struct StoryReadingView: View {
                 .frame(maxWidth: .infinity)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .padding(.horizontal, 20)
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        fullscreenImage = imageName
+                    }
+                }
+                .accessibilityHint("Tap to view full screen")
+        }
+    }
+
+    private var fullscreenImageOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.9)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        fullscreenImage = nil
+                    }
+                }
+
+            if let imageName = fullscreenImage {
+                Image(imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .padding(20)
+            }
+
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            fullscreenImage = nil
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 32))
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                    .padding(20)
+                    .accessibilityLabel("Close full screen image")
+                }
+                Spacer()
+            }
         }
     }
 
