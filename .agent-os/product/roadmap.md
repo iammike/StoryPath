@@ -46,8 +46,13 @@
 - [ ] Story progress indicators - Visual badges showing completed paths and overall progress `S`
 - [ ] Story collections/categories - Group stories by culture, theme, or collection (Grimm, Aesop, etc.) `M`
 - [ ] Additional stories authored - 4-6 more classic tales with branching narratives and audio `XL`
-- [ ] Illustration system - Display and manage story illustrations tied to scenes `M`
+- [x] Illustration system - Display and manage story illustrations tied to scenes `M`
 - [ ] Story map visualization - Show decision tree and explored/unexplored paths `L`
+- [x] Expand Little Red Riding Hood story text - Richer, more atmospheric prose `M`
+
+### Known Issues
+- [ ] Resume banner scrolls with content instead of staying fixed #77
+- [ ] Thin white line above illustration in safe area (iPhone) #70
 
 ### Dependencies
 
