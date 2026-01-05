@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        StoryReadingView(storyId: "little-red-riding-hood")
+        NavigationStack {
+            StoryLibraryView()
+        }
     }
 }
 

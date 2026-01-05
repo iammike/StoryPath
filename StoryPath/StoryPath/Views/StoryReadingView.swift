@@ -79,6 +79,9 @@ struct StoryReadingView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(white: 0.98))
         .ignoresSafeArea()
+        #if os(iOS)
+        .navigationBarHidden(true)
+        #endif
         .overlay {
             if fullscreenImage != nil {
                 fullscreenImageOverlay
