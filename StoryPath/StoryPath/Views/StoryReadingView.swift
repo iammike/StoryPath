@@ -20,6 +20,7 @@ struct StoryReadingView: View {
     @State private var showPullHint = false
     @State private var showResumeIndicator = false
     @State private var hasShownResumeIndicator = false
+    @State private var resumeIndicatorTask: Task<Void, Never>?
     #if os(iOS)
     @State private var orientation: UIDeviceOrientation = {
         let current = UIDevice.current.orientation
@@ -378,13 +379,18 @@ struct StoryReadingView: View {
                         withAnimation(.easeIn(duration: 0.3)) {
                             showResumeIndicator = true
                         }
-                        // Fade out after 1.5 seconds
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        // Fade out after 1.5 seconds (cancellable task)
+                        resumeIndicatorTask = Task {
+                            try? await Task.sleep(for: .seconds(1.5))
+                            guard !Task.isCancelled else { return }
                             withAnimation(.easeOut(duration: 0.5)) {
                                 showResumeIndicator = false
                             }
                         }
                     }
+                }
+                .onDisappear {
+                    resumeIndicatorTask?.cancel()
                 }
                 .onChange(of: viewModel.currentSegmentId) {
                     proxy.scrollTo("top", anchor: .top)
