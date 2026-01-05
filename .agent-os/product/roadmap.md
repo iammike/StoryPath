@@ -40,16 +40,16 @@
 
 ### Features
 
-- [ ] Story library home screen - Grid/list view of available stories with cover art `M`
+- [x] Story library home screen - Grid/list view of available stories with cover art `M`
 - [ ] Story detail/preview screen - Synopsis, sample illustration, estimated reading time, path count `S`
 - [ ] Story provenance metadata - Original author, publication year, cultural origin, historical context `S`
-- [ ] Story progress indicators - Visual badges showing completed paths and overall progress `S`
+- [x] Story progress indicators - Visual badges showing completed paths and overall progress `S`
 - [ ] Story collections/categories - Group stories by culture, theme, or collection (Grimm, Aesop, etc.) `M`
 - [ ] Additional stories authored - 4-6 more classic tales with branching narratives and audio `XL`
 - [x] Illustration system - Display and manage story illustrations tied to scenes `M`
 - [ ] Story map visualization - Show decision tree and explored/unexplored paths `L`
 - [x] Expand Little Red Riding Hood story text - Richer, more atmospheric prose `M`
-- [ ] Minimal story navigation bar - Home button and audio toggle, positioned above resume banner `S`
+- [x] Minimal story navigation bar - Pull-to-reveal nav with home, restart, and audio toggle `S`
 
 ### Known Issues
 - [x] Resume banner scrolls with content instead of staying fixed #77
