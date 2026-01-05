@@ -35,8 +35,9 @@ struct StoryReadingView: View {
         static let defaultTopPadding: CGFloat = 10
 
         // Content padding
+        static let contentHorizontalPadding: CGFloat = 16
         static let contentTopPadding: CGFloat = 12
-        static let contentBottomPadding: CGFloat = 100
+        static let contentBottomPadding: CGFloat = 60
 
         // Banner padding
         static let bannerHorizontalPadding: CGFloat = 16
@@ -183,6 +184,7 @@ struct StoryReadingView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(maxWidth: .infinity)
+                .padding(.top, -1) // Extend into safe area to cover gap
                 .onTapGesture {
                     withAnimation(.easeInOut(duration: 0.25)) {
                         fullscreenImage = imageName
@@ -231,48 +233,53 @@ struct StoryReadingView: View {
 
     private func segmentContentView(_ segment: StorySegment) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            VStack(spacing: 0) {
-                // Resume banner outside scroll view for proper positioning
-                if viewModel.didResumeFromBookmark {
-                    resumeBanner
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                        .safeAreaPadding(.top, topPadding)
-                        .safeAreaPadding(.horizontal)
-                }
-
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 24) {
-                            // Illustration
-                            illustrationView(for: segment)
-                                .id(hasValidImage(for: segment) ? "top" : nil)
-
-                            // Story text
-                            Text(segment.text)
-                                .font(.custom("Georgia", size: 18))
-                                .lineSpacing(6)
-                                .padding(.horizontal, 20)
-                                .id(hasValidImage(for: segment) ? nil : "top")
-
-                            // Choices or ending
-                            if segment.isEnding {
-                                endingView
-                            } else {
-                                choicesView(segment.choices)
-                            }
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Resume banner (scrolls with content)
+                        if viewModel.shouldShowResumeBanner {
+                            resumeBanner
+                                .id("top")
                         }
-                        .padding(.bottom, LayoutConstants.contentBottomPadding)
-                        .padding(.top, hasValidImage(for: segment) ? 0 : LayoutConstants.contentTopPadding)
-                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark || hasValidImage(for: segment) ? 0 : topPadding)
+
+                        // Illustration (or spacer for safe area on pages without images)
+                        if hasValidImage(for: segment) {
+                            illustrationView(for: segment)
+                                .id(viewModel.shouldShowResumeBanner ? "illustration" : "top")
+                        } else {
+                            Color.clear.frame(height: topPadding)
+                                .id(viewModel.shouldShowResumeBanner ? "spacer" : "top")
+                        }
+
+                        // Story text (trailing newline prevents descender clipping with lineSpacing)
+                        Text(segment.text + "\n")
+                            .font(.custom("Georgia", size: 18))
+                            .lineSpacing(6)
+                            .padding(.horizontal, LayoutConstants.contentHorizontalPadding)
+                            .padding(.top, 16)
+
+                        // Choices or ending
+                        if segment.isEnding {
+                            endingView
+                                .padding(.top, 24)
+                        } else {
+                            choicesView(segment.choices)
+                                .padding(.top, 24)
+                        }
                     }
-                    .defaultScrollAnchor(.top)
-                    .scrollIndicators(.hidden)
-                    .onChange(of: viewModel.currentSegmentId) {
-                        proxy.scrollTo("top", anchor: .top)
-                    }
+                    .padding(.bottom, LayoutConstants.contentBottomPadding)
+                }
+                .defaultScrollAnchor(.top)
+                .scrollIndicators(.hidden)
+                .scrollContentBackground(.hidden)
+                .ignoresSafeArea(.container, edges: .top)
+                .onAppear {
+                    proxy.scrollTo("top", anchor: .top)
+                }
+                .onChange(of: viewModel.currentSegmentId) {
+                    proxy.scrollTo("top", anchor: .top)
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: viewModel.didResumeFromBookmark)
 
             // Audio control button
             audioControlButton
@@ -333,7 +340,9 @@ struct StoryReadingView: View {
                 ForEach(choices.indices, id: \.self) { index in
                     let choice = choices[index]
                     Button {
-                        viewModel.selectChoice(choice)
+                        withAnimation(nil) {
+                            viewModel.selectChoice(choice)
+                        }
                     } label: {
                         HStack {
                             if viewModel.hasUsedAudioForSegment {
@@ -368,12 +377,14 @@ struct StoryReadingView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, LayoutConstants.contentHorizontalPadding)
     }
 
     private func continueButton(_ choice: StoryChoice) -> some View {
         Button {
-            viewModel.selectChoice(choice)
+            withAnimation(nil) {
+                viewModel.selectChoice(choice)
+            }
         } label: {
             Label("Continue", systemImage: "arrow.right.circle.fill")
                 .font(.system(size: 16, weight: .medium))
