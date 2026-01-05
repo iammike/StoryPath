@@ -251,10 +251,11 @@ struct StoryReadingView: View {
                                 .id(viewModel.shouldShowResumeBanner ? "spacer" : "top")
                         }
 
-                        // Story text (trailing newline prevents descender clipping with lineSpacing)
-                        Text(segment.text + "\n")
+                        // Story text (uses fixedSize to prevent descender clipping with lineSpacing)
+                        Text(segment.text)
                             .font(.custom("Georgia", size: 18))
                             .lineSpacing(6)
+                            .fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, LayoutConstants.contentHorizontalPadding)
                             .padding(.top, 16)
 
