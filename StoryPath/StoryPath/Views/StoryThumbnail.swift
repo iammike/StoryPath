@@ -20,14 +20,18 @@ struct StoryThumbnail: View {
         return nil
     }
 
-    private var hasProgress: Bool {
-        progress != nil && (progress?.completedPaths.count ?? 0) > 0
+    private var completedPaths: Int {
+        progress?.completedPaths.count ?? 0
+    }
+
+    private var isComplete: Bool {
+        completedPaths == story.pathCount && story.pathCount > 0
     }
 
     private var isInProgress: Bool {
         guard let progress = progress else { return false }
         // Has been read but not all paths completed
-        return progress.pathHistory.count > 1 && progress.completedPaths.count < story.pathCount
+        return progress.pathHistory.count > 1 && completedPaths < story.pathCount
     }
 
     var body: some View {
@@ -53,17 +57,17 @@ struct StoryThumbnail: View {
                 }
 
                 // Progress indicator
-                if hasProgress {
+                if isComplete {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 20))
                         .foregroundStyle(.white)
                         .background(Circle().fill(Color.green).padding(-2))
                         .padding(8)
                 } else if isInProgress {
-                    Circle()
-                        .fill(Color(red: 0.83, green: 0.66, blue: 0.29))
-                        .frame(width: 12, height: 12)
-                        .padding(12)
+                    Image(systemName: "bookmark.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+                        .padding(8)
                 }
             }
 
