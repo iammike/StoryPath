@@ -26,22 +26,25 @@ struct Story: Codable, Identifiable {
     private func calculateTotalPaths() -> Int {
         var uniquePaths = Set<String>()
 
-        func explorePaths(fromSegmentId segmentId: String, currentPath: String) {
+        func explorePaths(fromSegmentId segmentId: String, pathHistory: [String]) {
             guard let segment = segments.first(where: { $0.id == segmentId }) else { return }
 
+            var currentPath = pathHistory
+            currentPath.append(segmentId)
+
             if segment.choices.isEmpty {
-                uniquePaths.insert(currentPath)
+                // Reached an ending - record this path
+                uniquePaths.insert(currentPath.joined(separator: "-"))
                 return
             }
 
-            for (index, choice) in segment.choices.enumerated() {
-                let newPath = currentPath + "-\(index)"
-                explorePaths(fromSegmentId: choice.nextSegmentId, currentPath: newPath)
+            for choice in segment.choices {
+                explorePaths(fromSegmentId: choice.nextSegmentId, pathHistory: currentPath)
             }
         }
 
         if let firstSegment = segments.first {
-            explorePaths(fromSegmentId: firstSegment.id, currentPath: "start")
+            explorePaths(fromSegmentId: firstSegment.id, pathHistory: [])
         }
 
         return uniquePaths.count

@@ -29,36 +29,50 @@ struct FeaturedStoryCard: View {
     }
 
     private var buttonText: String {
-        if completedPaths == story.pathCount {
-            return "Read Again"
-        } else if hasStarted {
+        if hasStarted {
             return "Continue"
+        } else if completedPaths == story.pathCount {
+            return "Read Again"
         } else {
             return "Start Reading"
         }
     }
 
+    private var isComplete: Bool {
+        completedPaths == story.pathCount && story.pathCount > 0
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Featured image
-            GeometryReader { geometry in
-                if let imageName = thumbnailImage {
-                    Image(imageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                } else {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .overlay {
-                            Image(systemName: "book.closed")
-                                .font(.system(size: 48))
-                                .foregroundStyle(.gray)
-                        }
+            ZStack(alignment: .topTrailing) {
+                GeometryReader { geometry in
+                    if let imageName = thumbnailImage {
+                        Image(imageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .clipped()
+                    } else {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .overlay {
+                                Image(systemName: "book.closed")
+                                    .font(.system(size: 48))
+                                    .foregroundStyle(.gray)
+                            }
+                    }
+                }
+                .aspectRatio(16/9, contentMode: .fit)
+
+                if isComplete {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 28))
+                        .foregroundStyle(.white)
+                        .background(Circle().fill(Color.green).padding(-2))
+                        .padding(12)
                 }
             }
-            .aspectRatio(16/9, contentMode: .fit)
 
             // Info section
             VStack(alignment: .leading, spacing: 12) {

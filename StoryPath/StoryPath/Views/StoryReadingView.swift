@@ -17,9 +17,9 @@ struct StoryReadingView: View {
     @State private var viewModel = StoryReadingViewModel()
     @State private var fullscreenImage: String?
     @State private var showNavBar = false
-    @State private var showResumeToast = false
-    @State private var hasShownResumeToast = false
     @State private var showPullHint = false
+    @State private var showResumeIndicator = false
+    @State private var hasShownResumeIndicator = false
     #if os(iOS)
     @State private var orientation: UIDeviceOrientation = {
         let current = UIDevice.current.orientation
@@ -171,18 +171,14 @@ struct StoryReadingView: View {
             .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.6))
     }
 
-    private var resumeToast: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "bookmark.fill")
-                .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-            Text("Continuing where you left off")
-                .font(.subheadline)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(.ultraThinMaterial)
-        .cornerRadius(8)
-        .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+    private var resumeIndicator: some View {
+        Image(systemName: "bookmark.fill")
+            .font(.system(size: 32))
+            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+            .padding(16)
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
     }
 
     // MARK: - Subviews
@@ -374,15 +370,17 @@ struct StoryReadingView: View {
                 .ignoresSafeArea(.container, edges: .top)
                 .onAppear {
                     proxy.scrollTo("top", anchor: .top)
-                    // Show resume toast if resuming from saved position (only once per view lifecycle)
-                    if viewModel.shouldShowResumeBanner && !hasShownResumeToast {
-                        hasShownResumeToast = true
-                        showResumeToast = true
+                    // Show resume indicator if resuming from saved position (only once per session)
+                    if viewModel.shouldShowResumeBanner && !hasShownResumeIndicator {
+                        hasShownResumeIndicator = true
                         viewModel.dismissBookmarkNotice()
-                        // Auto-dismiss after 3 seconds
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            withAnimation(.easeOut(duration: 0.3)) {
-                                showResumeToast = false
+                        withAnimation(.easeIn(duration: 0.3)) {
+                            showResumeIndicator = true
+                        }
+                        // Fade out after 1.5 seconds
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            withAnimation(.easeOut(duration: 0.5)) {
+                                showResumeIndicator = false
                             }
                         }
                     }
@@ -405,11 +403,10 @@ struct StoryReadingView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .overlay(alignment: .top) {
-            if showResumeToast {
-                resumeToast
-                    .padding(.top, showNavBar ? 60 : 20)
-                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+        .overlay {
+            if showResumeIndicator {
+                resumeIndicator
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
         }
         .background(Color(white: 0.98))
