@@ -13,8 +13,14 @@ import AppKit
 struct StoryReadingView: View {
     let storyId: String
 
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel = StoryReadingViewModel()
     @State private var fullscreenImage: String?
+    @State private var showNavBar = false
+    @State private var showPullHint = false
+    @State private var showResumeIndicator = false
+    @State private var hasShownResumeIndicator = false
+    @State private var resumeIndicatorTask: Task<Void, Never>?
     #if os(iOS)
     @State private var orientation: UIDeviceOrientation = {
         let current = UIDevice.current.orientation
@@ -39,10 +45,10 @@ struct StoryReadingView: View {
         static let contentTopPadding: CGFloat = 12
         static let contentBottomPadding: CGFloat = 60
 
-        // Banner padding
-        static let bannerHorizontalPadding: CGFloat = 16
-        static let bannerTopPadding: CGFloat = 10
-        static let bannerBottomPadding: CGFloat = 14
+        // Pull-to-reveal thresholds
+        static let pullHintThreshold: CGFloat = 20
+        static let navBarRevealThreshold: CGFloat = 50
+        static let navBarHideThreshold: CGFloat = -100
     }
 
     private var topPadding: CGFloat {
@@ -110,10 +116,125 @@ struct StoryReadingView: View {
             viewModel.togglePlayPause()
         } label: {
             Image(systemName: viewModel.audioService.isCurrentlyPlaying ? "pause.circle.fill" : "play.circle.fill")
-                .font(.system(size: 44))
+                .font(.system(size: 22))
                 .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
         }
         .accessibilityLabel(viewModel.audioService.isCurrentlyPlaying ? "Pause reading" : "Read aloud")
+    }
+
+    private var storyNavigationBar: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button { dismiss() } label: {
+                    Image(systemName: "house.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+                }
+                .accessibilityLabel("Return to library")
+
+                if !viewModel.isAtStart {
+                    Button {
+                        viewModel.restartStory()
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showNavBar = false
+                        }
+                    } label: {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+                    }
+                    .accessibilityLabel("Start over")
+                    .padding(.leading, 16)
+                }
+
+                Spacer()
+
+                audioControlButton
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+
+            // Collapse button
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showNavBar = false
+                }
+            } label: {
+                Image(systemName: "chevron.compact.up")
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.6))
+            }
+            .accessibilityLabel("Hide menu")
+            .padding(.bottom, 4)
+        }
+        .background(Color(white: 0.98))
+    }
+
+    private var pullHint: some View {
+        Image(systemName: "chevron.compact.down")
+            .font(.system(size: 28, weight: .medium))
+            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.6))
+    }
+
+    // MARK: - Pull-to-reveal conditions
+
+    private func shouldShowPullHint(at offset: CGFloat) -> Bool {
+        offset > LayoutConstants.pullHintThreshold &&
+        offset <= LayoutConstants.navBarRevealThreshold &&
+        !showNavBar &&
+        !showPullHint
+    }
+
+    private func shouldRevealNavBar(at offset: CGFloat) -> Bool {
+        offset > LayoutConstants.navBarRevealThreshold && !showNavBar
+    }
+
+    private func shouldHideNavBar(at offset: CGFloat) -> Bool {
+        offset < LayoutConstants.navBarHideThreshold && showNavBar
+    }
+
+    private func shouldHidePullHint(at offset: CGFloat) -> Bool {
+        offset <= LayoutConstants.pullHintThreshold && showPullHint
+    }
+
+    private func handleScrollOffset(_ offset: CGFloat) {
+        if shouldShowPullHint(at: offset) {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showPullHint = true
+            }
+        } else if shouldRevealNavBar(at: offset) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showPullHint = false
+                showNavBar = true
+            }
+        } else if shouldHideNavBar(at: offset) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showNavBar = false
+            }
+        } else if shouldHidePullHint(at: offset) {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showPullHint = false
+            }
+        }
+    }
+
+    private func scrollTracker(safeAreaTop: CGFloat) -> some View {
+        GeometryReader { geometry in
+            Color.clear.onChange(of: geometry.frame(in: .global).minY) { _, newValue in
+                handleScrollOffset(newValue - safeAreaTop)
+            }
+        }
+    }
+
+    private var resumeIndicator: some View {
+        Image(systemName: "bookmark.fill")
+            .font(.system(size: 32))
+            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+            .padding(16)
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
     }
 
     // MARK: - Subviews
@@ -146,29 +267,6 @@ struct StoryReadingView: View {
             .buttonStyle(.bordered)
         }
         .padding()
-    }
-
-    private var resumeBanner: some View {
-        HStack {
-            Image(systemName: "bookmark.fill")
-                .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-            Text("Resuming story")
-                .font(.subheadline)
-            Spacer()
-            Button("Start Over") {
-                viewModel.restartStory()
-                viewModel.dismissBookmarkNotice()
-            }
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-        }
-        .padding(.horizontal, LayoutConstants.bannerHorizontalPadding)
-        .padding(.top, LayoutConstants.bannerTopPadding)
-        .padding(.bottom, LayoutConstants.bannerBottomPadding)
-        .background(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.15))
-        .onTapGesture {
-            viewModel.dismissBookmarkNotice()
-        }
     }
 
     private func hasValidImage(for segment: StorySegment) -> Bool {
@@ -235,23 +333,19 @@ struct StoryReadingView: View {
     }
 
     private func segmentContentView(_ segment: StorySegment) -> some View {
-        ZStack(alignment: .bottomTrailing) {
+        GeometryReader { outerGeometry in
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        // Resume banner (scrolls with content)
-                        if viewModel.shouldShowResumeBanner {
-                            resumeBanner
-                                .id("top")
-                        }
-
                         // Illustration (or spacer for safe area on pages without images)
                         if hasValidImage(for: segment) {
                             illustrationView(for: segment)
-                                .id(viewModel.shouldShowResumeBanner ? "illustration" : "top")
+                                .id("top")
+                                .background(scrollTracker(safeAreaTop: outerGeometry.safeAreaInsets.top))
                         } else {
                             Color.clear.frame(height: topPadding)
-                                .id(viewModel.shouldShowResumeBanner ? "spacer" : "top")
+                                .id("top")
+                                .background(scrollTracker(safeAreaTop: outerGeometry.safeAreaInsets.top))
                         }
 
                         // Story text (trailing newline prevents descender clipping with lineSpacing)
@@ -278,16 +372,49 @@ struct StoryReadingView: View {
                 .ignoresSafeArea(.container, edges: .top)
                 .onAppear {
                     proxy.scrollTo("top", anchor: .top)
+                    // Show resume indicator if resuming from saved position (only once per session)
+                    if viewModel.isResumingFromSavedPosition && !hasShownResumeIndicator {
+                        hasShownResumeIndicator = true
+                        viewModel.dismissBookmarkNotice()
+                        withAnimation(.easeIn(duration: 0.3)) {
+                            showResumeIndicator = true
+                        }
+                        // Fade out after 1.5 seconds (cancellable task)
+                        resumeIndicatorTask = Task {
+                            try? await Task.sleep(for: .seconds(1.5))
+                            guard !Task.isCancelled else { return }
+                            withAnimation(.easeOut(duration: 0.5)) {
+                                showResumeIndicator = false
+                            }
+                        }
+                    }
+                }
+                .onDisappear {
+                    resumeIndicatorTask?.cancel()
                 }
                 .onChange(of: viewModel.currentSegmentId) {
                     proxy.scrollTo("top", anchor: .top)
                 }
             }
-
-            // Audio control button
-            audioControlButton
-                .padding(.trailing, 20)
-                .padding(.bottom, 40)
+        }
+        .overlay(alignment: .top) {
+            if showPullHint && !showNavBar {
+                pullHint
+                    .padding(.top, 8)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .overlay(alignment: .top) {
+            if showNavBar {
+                storyNavigationBar
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .overlay {
+            if showResumeIndicator {
+                resumeIndicator
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
+            }
         }
         .background(Color(white: 0.98))
     }

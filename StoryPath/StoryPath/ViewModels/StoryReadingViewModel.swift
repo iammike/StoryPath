@@ -37,8 +37,8 @@ class StoryReadingViewModel {
         return currentSegmentId == startingSegment.id
     }
 
-    /// Only show the banner when we resumed to a non-starting segment
-    var shouldShowResumeBanner: Bool {
+    /// True when we resumed to a non-starting segment (for showing resume indicator)
+    var isResumingFromSavedPosition: Bool {
         didResumeFromBookmark && currentSegmentId == resumedSegmentId && !isAtStart
     }
 
