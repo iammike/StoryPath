@@ -49,6 +49,7 @@
 - [x] Illustration system - Display and manage story illustrations tied to scenes `M`
 - [ ] Story map visualization - Show decision tree and explored/unexplored paths `L`
 - [x] Expand Little Red Riding Hood story text - Richer, more atmospheric prose `M`
+- [ ] Minimal story navigation bar - Home button and audio toggle, positioned above resume banner `S`
 
 ### Known Issues
 - [x] Resume banner scrolls with content instead of staying fixed #77
