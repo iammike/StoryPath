@@ -40,14 +40,14 @@
     },
     {
       "id": "forest-path-authentic",
-      "text": "Little Red Riding Hood kissed her mother goodbye and set off into the forest, her basket swinging gently at her side. The morning sun filtered through the tall trees, casting dancing shadows on the winding path. Birds sang sweetly overhead, and squirrels chattered from the branches.\n\nShe had walked for some time, humming a little tune to herself, when she noticed she was no longer alone. A large wolf had stepped onto the path ahead of her. His fur was dark as shadow, and his eyes gleamed like amber in the dappled light.\n\nLittle Red Riding Hood had never seen a wolf before and did not know what a wicked creature he was. So she was not afraid when he spoke.\n\n'Good morning, Little Red Riding Hood,' said the wolf, his voice smooth as honey. 'What a lovely red cloak you're wearing. Where might you be going on this fine day?'\n\n'Good morning, sir,' she replied with a polite curtsy. 'I'm on my way to visit my grandmother, who lives in the cottage at the end of this path.'",
+      "text": "Little Red Riding Hood kissed her mother goodbye and set off into the forest, her basket swinging gently at her side. The morning sun filtered through the tall trees, casting dancing shadows on the winding path. Birds sang sweetly overhead, and squirrels chattered from the branches.\n\nShe had walked for some time, humming a little tune to herself, when she noticed she was no longer alone. A large wolf had stepped onto the path ahead of her. His fur was dark as shadow, and his eyes gleamed like amber in the dappled light.\n\nLittle Red Riding Hood had never seen a wolf before and did not know what a wicked creature he was. So she was not afraid when he spoke.\n\n'Good morning, Little Red Riding Hood,' said the wolf, his voice smooth as honey. 'What a lovely red cloak you're wearing. Where might you be going on this fine day?'",
       "audioFileName": "lrrh-wolf-encounter.m4a",
       "imageFileName": "lrrh-wolf-path",
       "isAuthenticPath": true,
       "choices": [
         {
           "id": "choice-tell-wolf",
-          "text": "Tell the wolf about grandmother's illness and the basket.",
+          "text": "Tell the wolf all about grandmother and the basket.",
           "nextSegmentId": "wolf-learns-details",
           "isAuthenticPath": true
         },
@@ -56,12 +56,6 @@
           "text": "Feel suspicious and hurry away without answering.",
           "nextSegmentId": "run-from-wolf",
           "isAuthenticPath": false
-        },
-        {
-          "id": "choice-pick-flowers",
-          "text": "The wolf suggests picking flowers for grandmother.",
-          "nextSegmentId": "pick-flowers",
-          "isAuthenticPath": true
         }
       ]
     },
@@ -88,7 +82,7 @@
     },
     {
       "id": "pick-flowers",
-      "text": "Little Red Riding Hood looked around and saw that the wolf was right—the forest was full of beautiful wildflowers! Sunbeams streamed through gaps in the trees, lighting up patches of daisies, buttercups, and purple violets.\n\n'Grandmother would love a bouquet,' she thought to herself. 'Surely it won't hurt to pick just a few.'\n\nShe stepped off the path and began gathering flowers. But each time she picked one, she spotted an even prettier one a little farther on, and then another, and another. She wandered deeper and deeper into the forest, her arms filling with blossoms.\n\nThe birds sang, the butterflies danced, and Little Red Riding Hood quite forgot her mother's warning to stay on the path. She did not see the wolf watching her from behind a tree, his tongue hanging out with hunger. And she did not know that while she picked flowers, the wolf was racing through the forest on his four swift legs, heading straight for grandmother's cottage.",
+      "text": "Little Red Riding Hood looked around and saw that the wolf was right—the forest was full of beautiful wildflowers! Sunbeams streamed through gaps in the trees, lighting up patches of daisies, buttercups, and purple violets.\n\n'Grandmother would love a bouquet,' she thought to herself. 'Surely it won't hurt to pick just a few.'\n\nShe stepped off the path and began gathering flowers. But each time she picked one, she spotted an even prettier one a little farther on, and then another, and another. She wandered deeper and deeper into the forest, her arms filling with blossoms.\n\nThe birds sang, the butterflies danced, and Little Red Riding Hood quite forgot her mother's warning to stay on the path. She did not know that while she picked flowers, the wolf was racing through the forest on his four swift legs, heading straight for grandmother's cottage.",
       "audioFileName": "lrrh-flowers.m4a",
       "imageFileName": "lrrh-picking-flowers",
       "isAuthenticPath": true,

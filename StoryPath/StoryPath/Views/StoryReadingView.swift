@@ -35,8 +35,9 @@ struct StoryReadingView: View {
         static let defaultTopPadding: CGFloat = 10
 
         // Content padding
+        static let contentHorizontalPadding: CGFloat = 16
         static let contentTopPadding: CGFloat = 12
-        static let contentBottomPadding: CGFloat = 100
+        static let contentBottomPadding: CGFloat = 60
 
         // Banner padding
         static let bannerHorizontalPadding: CGFloat = 16
@@ -231,54 +232,54 @@ struct StoryReadingView: View {
 
     private func segmentContentView(_ segment: StorySegment) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            VStack(spacing: 0) {
-                // Resume banner outside scroll view for proper positioning
-                if viewModel.didResumeFromBookmark {
-                    resumeBanner
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                        .safeAreaPadding(.top, topPadding)
-                        .safeAreaPadding(.horizontal)
-                }
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        // Illustration
+                        illustrationView(for: segment)
+                            .id(hasValidImage(for: segment) ? "top" : nil)
 
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 24) {
-                            // Illustration
-                            illustrationView(for: segment)
-                                .id(hasValidImage(for: segment) ? "top" : nil)
+                        // Story text
+                        Text(segment.text)
+                            .font(.custom("Georgia", size: 18))
+                            .lineSpacing(6)
+                            .padding(.horizontal, LayoutConstants.contentHorizontalPadding)
+                            .padding(.bottom, 4) // Prevent descender clipping
+                            .id(hasValidImage(for: segment) ? nil : "top")
 
-                            // Story text
-                            Text(segment.text)
-                                .font(.custom("Georgia", size: 18))
-                                .lineSpacing(6)
-                                .padding(.horizontal, 20)
-                                .id(hasValidImage(for: segment) ? nil : "top")
-
-                            // Choices or ending
-                            if segment.isEnding {
-                                endingView
-                            } else {
-                                choicesView(segment.choices)
-                            }
+                        // Choices or ending
+                        if segment.isEnding {
+                            endingView
+                        } else {
+                            choicesView(segment.choices)
                         }
-                        .padding(.bottom, LayoutConstants.contentBottomPadding)
-                        .padding(.top, hasValidImage(for: segment) ? 0 : LayoutConstants.contentTopPadding)
-                        .safeAreaPadding(.top, viewModel.didResumeFromBookmark || hasValidImage(for: segment) ? 0 : topPadding)
                     }
-                    .defaultScrollAnchor(.top)
-                    .scrollIndicators(.hidden)
-                    .onChange(of: viewModel.currentSegmentId) {
-                        proxy.scrollTo("top", anchor: .top)
-                    }
+                    .padding(.bottom, LayoutConstants.contentBottomPadding)
+                    .padding(.top, hasValidImage(for: segment) ? 0 : LayoutConstants.contentTopPadding)
+                    .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 50 : (hasValidImage(for: segment) ? 0 : topPadding))
+                }
+                .defaultScrollAnchor(.top)
+                .scrollIndicators(.hidden)
+                .contentMargins(.top, hasValidImage(for: segment) ? -50 : 0, for: .scrollContent)
+                .onChange(of: viewModel.currentSegmentId) {
+                    proxy.scrollTo("top", anchor: .top)
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: viewModel.didResumeFromBookmark)
 
             // Audio control button
             audioControlButton
                 .padding(.trailing, 20)
                 .padding(.bottom, 40)
         }
+        .overlay(alignment: .top) {
+            if viewModel.didResumeFromBookmark {
+                resumeBanner
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .safeAreaPadding(.top, topPadding)
+                    .safeAreaPadding(.horizontal)
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: viewModel.didResumeFromBookmark)
         .background(Color(white: 0.98))
     }
 
@@ -368,7 +369,7 @@ struct StoryReadingView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, LayoutConstants.contentHorizontalPadding)
     }
 
     private func continueButton(_ choice: StoryChoice) -> some View {
