@@ -43,6 +43,11 @@ struct StoryReadingView: View {
         static let contentHorizontalPadding: CGFloat = 16
         static let contentTopPadding: CGFloat = 12
         static let contentBottomPadding: CGFloat = 60
+
+        // Pull-to-reveal thresholds
+        static let pullHintThreshold: CGFloat = 20
+        static let navBarRevealThreshold: CGFloat = 50
+        static let navBarHideThreshold: CGFloat = -100
     }
 
     private var topPadding: CGFloat {
@@ -171,6 +176,37 @@ struct StoryReadingView: View {
             .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.6))
     }
 
+    private func handleScrollOffset(_ offset: CGFloat) {
+        if offset > LayoutConstants.pullHintThreshold && offset <= LayoutConstants.navBarRevealThreshold && !showNavBar {
+            if !showPullHint {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    showPullHint = true
+                }
+            }
+        } else if offset > LayoutConstants.navBarRevealThreshold && !showNavBar {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showPullHint = false
+                showNavBar = true
+            }
+        } else if offset < LayoutConstants.navBarHideThreshold && showNavBar {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showNavBar = false
+            }
+        } else if offset <= LayoutConstants.pullHintThreshold && showPullHint {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showPullHint = false
+            }
+        }
+    }
+
+    private func scrollTracker(safeAreaTop: CGFloat) -> some View {
+        GeometryReader { geometry in
+            Color.clear.onChange(of: geometry.frame(in: .global).minY) { _, newValue in
+                handleScrollOffset(newValue - safeAreaTop)
+            }
+        }
+    }
+
     private var resumeIndicator: some View {
         Image(systemName: "bookmark.fill")
             .font(.system(size: 32))
@@ -285,65 +321,11 @@ struct StoryReadingView: View {
                         if hasValidImage(for: segment) {
                             illustrationView(for: segment)
                                 .id("top")
-                                .background(
-                                    GeometryReader { innerGeometry in
-                                        Color.clear.onChange(of: innerGeometry.frame(in: .global).minY) { _, newValue in
-                                            let offset = newValue - outerGeometry.safeAreaInsets.top
-                                            // Show pull hint when starting to pull, show nav bar when pulled enough
-                                            if offset > 20 && offset <= 50 && !showNavBar {
-                                                if !showPullHint {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        showPullHint = true
-                                                    }
-                                                }
-                                            } else if offset > 50 && !showNavBar {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    showPullHint = false
-                                                    showNavBar = true
-                                                }
-                                            } else if offset < -100 && showNavBar {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    showNavBar = false
-                                                }
-                                            } else if offset <= 20 && showPullHint {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    showPullHint = false
-                                                }
-                                            }
-                                        }
-                                    }
-                                )
+                                .background(scrollTracker(safeAreaTop: outerGeometry.safeAreaInsets.top))
                         } else {
                             Color.clear.frame(height: topPadding)
                                 .id("top")
-                                .background(
-                                    GeometryReader { innerGeometry in
-                                        Color.clear.onChange(of: innerGeometry.frame(in: .global).minY) { _, newValue in
-                                            let offset = newValue - outerGeometry.safeAreaInsets.top
-                                            // Show pull hint when starting to pull, show nav bar when pulled enough
-                                            if offset > 20 && offset <= 50 && !showNavBar {
-                                                if !showPullHint {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        showPullHint = true
-                                                    }
-                                                }
-                                            } else if offset > 50 && !showNavBar {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    showPullHint = false
-                                                    showNavBar = true
-                                                }
-                                            } else if offset < -100 && showNavBar {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    showNavBar = false
-                                                }
-                                            } else if offset <= 20 && showPullHint {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    showPullHint = false
-                                                }
-                                            }
-                                        }
-                                    }
-                                )
+                                .background(scrollTracker(safeAreaTop: outerGeometry.safeAreaInsets.top))
                         }
 
                         // Story text (trailing newline prevents descender clipping with lineSpacing)
