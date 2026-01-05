@@ -176,23 +176,42 @@ struct StoryReadingView: View {
             .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.6))
     }
 
+    // MARK: - Pull-to-reveal conditions
+
+    private func shouldShowPullHint(at offset: CGFloat) -> Bool {
+        offset > LayoutConstants.pullHintThreshold &&
+        offset <= LayoutConstants.navBarRevealThreshold &&
+        !showNavBar &&
+        !showPullHint
+    }
+
+    private func shouldRevealNavBar(at offset: CGFloat) -> Bool {
+        offset > LayoutConstants.navBarRevealThreshold && !showNavBar
+    }
+
+    private func shouldHideNavBar(at offset: CGFloat) -> Bool {
+        offset < LayoutConstants.navBarHideThreshold && showNavBar
+    }
+
+    private func shouldHidePullHint(at offset: CGFloat) -> Bool {
+        offset <= LayoutConstants.pullHintThreshold && showPullHint
+    }
+
     private func handleScrollOffset(_ offset: CGFloat) {
-        if offset > LayoutConstants.pullHintThreshold && offset <= LayoutConstants.navBarRevealThreshold && !showNavBar {
-            if !showPullHint {
-                withAnimation(.easeInOut(duration: 0.15)) {
-                    showPullHint = true
-                }
+        if shouldShowPullHint(at: offset) {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showPullHint = true
             }
-        } else if offset > LayoutConstants.navBarRevealThreshold && !showNavBar {
+        } else if shouldRevealNavBar(at: offset) {
             withAnimation(.easeInOut(duration: 0.2)) {
                 showPullHint = false
                 showNavBar = true
             }
-        } else if offset < LayoutConstants.navBarHideThreshold && showNavBar {
+        } else if shouldHideNavBar(at: offset) {
             withAnimation(.easeInOut(duration: 0.2)) {
                 showNavBar = false
             }
-        } else if offset <= LayoutConstants.pullHintThreshold && showPullHint {
+        } else if shouldHidePullHint(at: offset) {
             withAnimation(.easeInOut(duration: 0.15)) {
                 showPullHint = false
             }
