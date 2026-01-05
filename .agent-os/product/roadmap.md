@@ -51,8 +51,8 @@
 - [x] Expand Little Red Riding Hood story text - Richer, more atmospheric prose `M`
 
 ### Known Issues
-- [ ] Resume banner scrolls with content instead of staying fixed #77
-- [ ] Thin white line above illustration in safe area (iPhone) #70
+- [x] Resume banner scrolls with content instead of staying fixed #77
+- [x] Thin white line above illustration in safe area (iPhone) #70
 
 ### Dependencies
 
