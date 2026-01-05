@@ -37,9 +37,9 @@ class StoryReadingViewModel {
         return currentSegmentId == startingSegment.id
     }
 
-    /// Only show the banner when we're still on the segment we resumed to
+    /// Only show the banner when we resumed to a non-starting segment
     var shouldShowResumeBanner: Bool {
-        didResumeFromBookmark && currentSegmentId == resumedSegmentId
+        didResumeFromBookmark && currentSegmentId == resumedSegmentId && !isAtStart
     }
 
     var completedPathsCount: Int {

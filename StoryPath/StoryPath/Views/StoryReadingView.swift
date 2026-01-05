@@ -10,13 +10,6 @@ import UIKit
 import AppKit
 #endif
 
-private struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
 struct StoryReadingView: View {
     let storyId: String
 
@@ -191,6 +184,7 @@ struct StoryReadingView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(maxWidth: .infinity)
+                .padding(.top, -1) // Extend into safe area to cover gap
                 .onTapGesture {
                     withAnimation(.easeInOut(duration: 0.25)) {
                         fullscreenImage = imageName
@@ -242,36 +236,27 @@ struct StoryReadingView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        // Scroll offset tracker (invisible)
-                        GeometryReader { geometry in
-                            Color.clear.preference(
-                                key: ScrollOffsetPreferenceKey.self,
-                                value: -geometry.frame(in: .named("scroll")).minY
-                            )
+                        // Resume banner (scrolls with content)
+                        if viewModel.shouldShowResumeBanner {
+                            resumeBanner
+                                .id("top")
                         }
-                        .frame(height: 0)
 
-                        // Resume banner (scrolls with content, collapses smoothly when dismissed)
-                        VStack(spacing: 0) {
-                            if viewModel.shouldShowResumeBanner {
-                                resumeBanner
-                            }
+                        // Illustration (or spacer for safe area on pages without images)
+                        if hasValidImage(for: segment) {
+                            illustrationView(for: segment)
+                                .id(viewModel.shouldShowResumeBanner ? "illustration" : "top")
+                        } else {
+                            Color.clear.frame(height: topPadding)
+                                .id(viewModel.shouldShowResumeBanner ? "spacer" : "top")
                         }
-                        .frame(height: viewModel.shouldShowResumeBanner ? nil : 0)
-                        .clipped()
-                        .id("top")
 
-                        // Illustration
-                        illustrationView(for: segment)
-
-                        // Story text
-                        Text(segment.text)
+                        // Story text (trailing newline prevents descender clipping with lineSpacing)
+                        Text(segment.text + "\n")
                             .font(.custom("Georgia", size: 18))
                             .lineSpacing(6)
                             .padding(.horizontal, LayoutConstants.contentHorizontalPadding)
-                            .padding(.top, 24)
-                            .padding(.bottom, 4) // Prevent descender clipping
-                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.top, 16)
 
                         // Choices or ending
                         if segment.isEnding {
@@ -283,21 +268,18 @@ struct StoryReadingView: View {
                         }
                     }
                     .padding(.bottom, LayoutConstants.contentBottomPadding)
-                    .safeAreaPadding(.top, hasValidImage(for: segment) ? 0 : topPadding)
                 }
                 .defaultScrollAnchor(.top)
                 .scrollIndicators(.hidden)
-                .coordinateSpace(name: "scroll")
-                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
-                    if offset > 50 && viewModel.shouldShowResumeBanner {
-                        viewModel.dismissBookmarkNotice()
-                    }
+                .scrollContentBackground(.hidden)
+                .ignoresSafeArea(.container, edges: .top)
+                .onAppear {
+                    proxy.scrollTo("top", anchor: .top)
                 }
                 .onChange(of: viewModel.currentSegmentId) {
                     proxy.scrollTo("top", anchor: .top)
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: viewModel.shouldShowResumeBanner)
 
             // Audio control button
             audioControlButton
