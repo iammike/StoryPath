@@ -373,7 +373,7 @@ struct StoryReadingView: View {
                 .onAppear {
                     proxy.scrollTo("top", anchor: .top)
                     // Show resume indicator if resuming from saved position (only once per session)
-                    if viewModel.shouldShowResumeBanner && !hasShownResumeIndicator {
+                    if viewModel.isResumingFromSavedPosition && !hasShownResumeIndicator {
                         hasShownResumeIndicator = true
                         viewModel.dismissBookmarkNotice()
                         withAnimation(.easeIn(duration: 0.3)) {
