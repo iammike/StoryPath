@@ -16,6 +16,7 @@ class StoryReadingViewModel {
     var isAudioEnabled = false
     private(set) var hasUsedAudioForSegment = false
     private(set) var didResumeFromBookmark = false
+    private var resumedSegmentId: String?
 
     private let storyLoader: StoryLoader
     private let progressService: ProgressService
@@ -34,6 +35,11 @@ class StoryReadingViewModel {
         guard let story = story,
               let startingSegment = storyLoader.getStartingSegment(for: story) else { return false }
         return currentSegmentId == startingSegment.id
+    }
+
+    /// Only show the banner when we're still on the segment we resumed to
+    var shouldShowResumeBanner: Bool {
+        didResumeFromBookmark && currentSegmentId == resumedSegmentId
     }
 
     var completedPathsCount: Int {
@@ -79,7 +85,9 @@ class StoryReadingViewModel {
                     progress = existingProgress
                     currentSegmentId = existingProgress.currentSegmentId
                     // Check if we're resuming from a non-starting position
-                    didResumeFromBookmark = existingProgress.currentSegmentId != startingSegment.id
+                    let isResuming = existingProgress.currentSegmentId != startingSegment.id
+                    didResumeFromBookmark = isResuming
+                    resumedSegmentId = isResuming ? existingProgress.currentSegmentId : nil
                 } else {
                     progress = progressService.createNewProgress(
                         for: storyId,

@@ -10,6 +10,13 @@ import UIKit
 import AppKit
 #endif
 
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 struct StoryReadingView: View {
     let storyId: String
 
@@ -234,52 +241,69 @@ struct StoryReadingView: View {
         ZStack(alignment: .bottomTrailing) {
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Scroll offset tracker (invisible)
+                        GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: ScrollOffsetPreferenceKey.self,
+                                value: -geometry.frame(in: .named("scroll")).minY
+                            )
+                        }
+                        .frame(height: 0)
+
+                        // Resume banner (scrolls with content, collapses smoothly when dismissed)
+                        VStack(spacing: 0) {
+                            if viewModel.shouldShowResumeBanner {
+                                resumeBanner
+                            }
+                        }
+                        .frame(height: viewModel.shouldShowResumeBanner ? nil : 0)
+                        .clipped()
+                        .id("top")
+
                         // Illustration
                         illustrationView(for: segment)
-                            .id(hasValidImage(for: segment) ? "top" : nil)
 
                         // Story text
                         Text(segment.text)
                             .font(.custom("Georgia", size: 18))
                             .lineSpacing(6)
                             .padding(.horizontal, LayoutConstants.contentHorizontalPadding)
+                            .padding(.top, 24)
                             .padding(.bottom, 4) // Prevent descender clipping
-                            .id(hasValidImage(for: segment) ? nil : "top")
+                            .fixedSize(horizontal: false, vertical: true)
 
                         // Choices or ending
                         if segment.isEnding {
                             endingView
+                                .padding(.top, 24)
                         } else {
                             choicesView(segment.choices)
+                                .padding(.top, 24)
                         }
                     }
                     .padding(.bottom, LayoutConstants.contentBottomPadding)
-                    .padding(.top, hasValidImage(for: segment) ? 0 : LayoutConstants.contentTopPadding)
-                    .safeAreaPadding(.top, viewModel.didResumeFromBookmark ? 50 : (hasValidImage(for: segment) ? 0 : topPadding))
+                    .safeAreaPadding(.top, hasValidImage(for: segment) ? 0 : topPadding)
                 }
                 .defaultScrollAnchor(.top)
                 .scrollIndicators(.hidden)
-                .contentMargins(.top, hasValidImage(for: segment) ? -50 : 0, for: .scrollContent)
+                .coordinateSpace(name: "scroll")
+                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
+                    if offset > 50 && viewModel.shouldShowResumeBanner {
+                        viewModel.dismissBookmarkNotice()
+                    }
+                }
                 .onChange(of: viewModel.currentSegmentId) {
                     proxy.scrollTo("top", anchor: .top)
                 }
             }
+            .animation(.easeInOut(duration: 0.3), value: viewModel.shouldShowResumeBanner)
 
             // Audio control button
             audioControlButton
                 .padding(.trailing, 20)
                 .padding(.bottom, 40)
         }
-        .overlay(alignment: .top) {
-            if viewModel.didResumeFromBookmark {
-                resumeBanner
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .safeAreaPadding(.top, topPadding)
-                    .safeAreaPadding(.horizontal)
-            }
-        }
-        .animation(.easeInOut(duration: 0.3), value: viewModel.didResumeFromBookmark)
         .background(Color(white: 0.98))
     }
 
@@ -334,7 +358,9 @@ struct StoryReadingView: View {
                 ForEach(choices.indices, id: \.self) { index in
                     let choice = choices[index]
                     Button {
-                        viewModel.selectChoice(choice)
+                        withAnimation(nil) {
+                            viewModel.selectChoice(choice)
+                        }
                     } label: {
                         HStack {
                             if viewModel.hasUsedAudioForSegment {
@@ -374,7 +400,9 @@ struct StoryReadingView: View {
 
     private func continueButton(_ choice: StoryChoice) -> some View {
         Button {
-            viewModel.selectChoice(choice)
+            withAnimation(nil) {
+                viewModel.selectChoice(choice)
+            }
         } label: {
             Label("Continue", systemImage: "arrow.right.circle.fill")
                 .font(.system(size: 16, weight: .medium))
