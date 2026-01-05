@@ -77,6 +77,7 @@
 - [ ] Parental gate - Simple math problem or pattern before purchases `S`
 - [ ] Top navigation bar - Controls, settings access, navigation options `M`
 - [ ] Settings screen - Audio preferences, text size, app info, restore purchases `S`
+- [ ] Reset progress - Option to reset progress for individual stories or all stories `S`
 - [ ] Customizable fonts and color schemes - Preselected fonts, color themes, dark mode support `M`
 - [ ] Onboarding flow - Welcome screens explaining app features and value `M`
 - [ ] App icon and launch screen - Professional branding assets `S`
