@@ -667,4 +667,98 @@ struct StoryPathTests {
         #expect(!speechText.contains("Tap continue"))
     }
 
+    // MARK: - StoryLibraryViewModel Tests
+
+    @Test func testLibraryViewModelLoadStories() async throws {
+        let viewModel = StoryLibraryViewModel()
+
+        #expect(viewModel.stories.isEmpty)
+        #expect(viewModel.isLoading == false)
+
+        await viewModel.loadStories()
+
+        #expect(!viewModel.stories.isEmpty)
+        #expect(viewModel.isLoading == false)
+    }
+
+    @Test func testLibraryViewModelFeaturedStory() async throws {
+        let viewModel = StoryLibraryViewModel()
+
+        await viewModel.loadStories()
+
+        // With no progress, featured should be first story
+        #expect(viewModel.featuredStory != nil)
+        #expect(viewModel.featuredStory?.id == viewModel.stories.first?.id)
+    }
+
+    @Test func testLibraryViewModelCarouselStories() async throws {
+        let viewModel = StoryLibraryViewModel()
+
+        await viewModel.loadStories()
+
+        // Carousel should exclude featured story
+        let featured = viewModel.featuredStory
+        let carousel = viewModel.carouselStories
+
+        if let featured = featured {
+            #expect(!carousel.contains(where: { $0.id == featured.id }))
+        }
+
+        // Total should match
+        #expect(viewModel.stories.count == carousel.count + (featured != nil ? 1 : 0))
+    }
+
+    @Test func testLibraryViewModelProgress() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-library-progress")!
+        testDefaults.removePersistentDomain(forName: "test-library-progress")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryLibraryViewModel(
+            progressService: progressService
+        )
+
+        await viewModel.loadStories()
+
+        // No progress initially
+        if let firstStory = viewModel.stories.first {
+            #expect(viewModel.progress(for: firstStory.id) == nil)
+        }
+
+        // Create progress
+        if let firstStory = viewModel.stories.first {
+            let progress = progressService.createNewProgress(
+                for: firstStory.id,
+                startingSegmentId: "start"
+            )
+            progressService.saveProgress(progress)
+
+            #expect(viewModel.progress(for: firstStory.id) != nil)
+        }
+    }
+
+    @Test func testLibraryViewModelFeaturedWithProgress() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-library-featured-progress")!
+        testDefaults.removePersistentDomain(forName: "test-library-featured-progress")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryLibraryViewModel(
+            progressService: progressService
+        )
+
+        await viewModel.loadStories()
+
+        // Create progress for the story
+        if let story = viewModel.stories.first {
+            var progress = progressService.createNewProgress(
+                for: story.id,
+                startingSegmentId: "start"
+            )
+            progress.lastReadDate = Date()
+            progressService.saveProgress(progress)
+
+            // Featured should be the story with most recent progress
+            #expect(viewModel.featuredStory?.id == story.id)
+        }
+    }
+
 }

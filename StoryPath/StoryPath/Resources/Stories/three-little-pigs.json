@@ -1,0 +1,52 @@
+{
+  "id": "three-little-pigs",
+  "title": "The Three Little Pigs",
+  "author": "Joseph Jacobs",
+  "originalSource": "English Fairy Tales (1890)",
+  "culturalOrigin": "English",
+  "synopsis": "Three pig brothers each build a house, but only one can withstand the big bad wolf.",
+  "coverImageName": "three-little-pigs-cover",
+  "estimatedReadingMinutes": 8,
+  "ageRange": "3-6",
+  "tags": ["classic", "fairy-tale", "animals", "building"],
+  "isPurchased": true,
+  "segments": [
+    {
+      "id": "start",
+      "text": "Once upon a time, there were three little pigs who lived with their mother. One day, she told them it was time to go out into the world and build homes of their own.\n\nThe first little pig was lazy and wanted to finish quickly. The second pig worked a bit harder. The third pig was the wisest of all.",
+      "audioFileName": null,
+      "imageFileName": null,
+      "isAuthenticPath": true,
+      "choices": [
+        {
+          "id": "choice-straw",
+          "text": "Follow the first pig who builds with straw",
+          "nextSegmentId": "straw-house",
+          "isAuthenticPath": false
+        },
+        {
+          "id": "choice-brick",
+          "text": "Follow the wise pig who builds with bricks",
+          "nextSegmentId": "brick-house",
+          "isAuthenticPath": true
+        }
+      ]
+    },
+    {
+      "id": "straw-house",
+      "text": "The first little pig built his house of straw. It was quick and easy! But then came the big bad wolf...\n\n'Little pig, little pig, let me come in!'\n\n'Not by the hair of my chinny chin chin!'\n\n'Then I'll huff, and I'll puff, and I'll blow your house in!'\n\nAnd with one big breath, the wolf blew the straw house down!",
+      "audioFileName": null,
+      "imageFileName": null,
+      "isAuthenticPath": false,
+      "choices": []
+    },
+    {
+      "id": "brick-house",
+      "text": "The third little pig worked hard building his house of bricks. It took many days, but when the wolf came...\n\n'Little pig, little pig, let me come in!'\n\n'Not by the hair of my chinny chin chin!'\n\n'Then I'll huff, and I'll puff, and I'll blow your house in!'\n\nBut no matter how hard the wolf huffed and puffed, the brick house stood strong! The wolf gave up and ran away, and the three little pigs lived happily ever after.",
+      "audioFileName": null,
+      "imageFileName": null,
+      "isAuthenticPath": true,
+      "choices": []
+    }
+  ]
+}

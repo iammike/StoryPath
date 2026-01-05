@@ -49,6 +49,7 @@
 - [x] Illustration system - Display and manage story illustrations tied to scenes `M`
 - [ ] Story map visualization - Show decision tree and explored/unexplored paths `L`
 - [x] Expand Little Red Riding Hood story text - Richer, more atmospheric prose `M`
+- [ ] Minimal story navigation bar - Home button and audio toggle, positioned above resume banner `S`
 
 ### Known Issues
 - [x] Resume banner scrolls with content instead of staying fixed #77
@@ -77,6 +78,7 @@
 - [ ] Parental gate - Simple math problem or pattern before purchases `S`
 - [ ] Top navigation bar - Controls, settings access, navigation options `M`
 - [ ] Settings screen - Audio preferences, text size, app info, restore purchases `S`
+- [ ] Reset progress - Option to reset progress for individual stories or all stories `S`
 - [ ] Customizable fonts and color schemes - Preselected fonts, color themes, dark mode support `M`
 - [ ] Onboarding flow - Welcome screens explaining app features and value `M`
 - [ ] App icon and launch screen - Professional branding assets `S`
