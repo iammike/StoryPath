@@ -87,6 +87,7 @@
 - [ ] Accessibility improvements - VoiceOver support, Dynamic Type, contrast modes `L`
 - [ ] Performance optimization - Reduce app size, optimize asset loading, smooth animations `M`
 - [ ] App Store assets - Screenshots, preview video, app description, keywords `M`
+- [ ] High-quality voice narration - Pre-recorded AI or professional audio narration for stories `L`
 
 ### Dependencies
 
@@ -112,7 +113,6 @@
 - [ ] Reading statistics - Time spent reading, favorite stories, paths explored `S`
 - [ ] Audio customization - Narration speed control, voice selection (if multiple available) `M`
 - [ ] Audio preview for choice buttons - Let non-readers hear choices before selecting #95 `M`
-- [ ] Professional voice narration - Pre-recorded audio narration for stories `L`
 - [ ] Story favorites - Mark and quickly access favorite stories `XS`
 - [ ] Path recommendations - "Haven't tried this path yet" suggestions `S`
 - [ ] Back button navigation - Navigate backwards through selected story path `M`
