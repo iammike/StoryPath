@@ -153,7 +153,7 @@ struct StoryReadingView: View {
 
             audioControlButton
 
-            // Dismiss button
+            // Hide menu button
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     showNavBar = false
