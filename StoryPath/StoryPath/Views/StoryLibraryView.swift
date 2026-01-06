@@ -13,26 +13,31 @@ struct StoryLibraryView: View {
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Custom header
-                    Text("Stories")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+            ZStack {
+                Color(white: 0.98)
+                    .ignoresSafeArea()
 
-                    if viewModel.isLoading {
-                        loadingView
-                    } else if viewModel.stories.isEmpty {
-                        emptyView
-                    } else {
-                        contentView
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Custom header
+                        Text("Stories")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+
+                        if viewModel.isLoading {
+                            loadingView
+                        } else if viewModel.stories.isEmpty {
+                            emptyView
+                        } else {
+                            contentView
+                        }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.bottom, 16)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 8)
-                .padding(.bottom, 16)
+                .scrollContentBackground(.hidden)
             }
-            .background(Color(white: 0.98))
             #if os(iOS)
             .navigationBarHidden(true)
             #endif

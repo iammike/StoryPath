@@ -70,23 +70,26 @@ struct StoryReadingView: View {
     }
 
     var body: some View {
-        Group {
-            if viewModel.isLoading {
-                loadingView
-            } else if let error = viewModel.errorMessage {
-                errorView(error)
-            } else if let segment = viewModel.currentSegment {
-                segmentContentView(segment)
-            } else {
-                Text("No content available")
-                    .foregroundStyle(.secondary)
+        ZStack {
+            Color(white: 0.98)
+                .ignoresSafeArea()
+
+            Group {
+                if viewModel.isLoading {
+                    loadingView
+                } else if let error = viewModel.errorMessage {
+                    errorView(error)
+                } else if let segment = viewModel.currentSegment {
+                    segmentContentView(segment)
+                } else {
+                    Text("No content available")
+                        .foregroundStyle(.secondary)
+                }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(white: 0.98))
-        .ignoresSafeArea()
         #if os(iOS)
         .navigationBarHidden(true)
+        .toolbarBackground(.hidden, for: .navigationBar)
         #endif
         .overlay {
             if fullscreenImage != nil {
@@ -123,51 +126,49 @@ struct StoryReadingView: View {
     }
 
     private var storyNavigationBar: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button { dismiss() } label: {
-                    Image(systemName: "house.fill")
-                        .font(.system(size: 22))
+        HStack {
+            Button { dismiss() } label: {
+                Image(systemName: "house.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+            }
+            .accessibilityLabel("Return to library")
+
+            if !viewModel.isAtStart {
+                Button {
+                    viewModel.restartStory()
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showNavBar = false
+                    }
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.system(size: 20))
                         .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
                 }
-                .accessibilityLabel("Return to library")
-
-                if !viewModel.isAtStart {
-                    Button {
-                        viewModel.restartStory()
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            showNavBar = false
-                        }
-                    } label: {
-                        Image(systemName: "arrow.counterclockwise")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-                    }
-                    .accessibilityLabel("Start over")
-                    .padding(.leading, 16)
-                }
-
-                Spacer()
-
-                audioControlButton
+                .accessibilityLabel("Start over")
+                .padding(.leading, 16)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
 
-            // Collapse button
+            Spacer()
+
+            audioControlButton
+
+            // Dismiss button
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     showNavBar = false
                 }
             } label: {
-                Image(systemName: "chevron.compact.up")
-                    .font(.system(size: 24, weight: .medium))
-                    .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29).opacity(0.6))
+                Image(systemName: "xmark")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
             }
             .accessibilityLabel("Hide menu")
-            .padding(.bottom, 4)
+            .padding(.leading, 16)
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 12)
         .background(Color(white: 0.98))
     }
 
@@ -369,7 +370,6 @@ struct StoryReadingView: View {
                 .defaultScrollAnchor(.top)
                 .scrollIndicators(.hidden)
                 .scrollContentBackground(.hidden)
-                .ignoresSafeArea(.container, edges: .top)
                 .onAppear {
                     proxy.scrollTo("top", anchor: .top)
                     // Show resume indicator if resuming from saved position (only once per session)
@@ -407,7 +407,7 @@ struct StoryReadingView: View {
         .overlay(alignment: .top) {
             if showNavBar {
                 storyNavigationBar
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .transition(.opacity)
             }
         }
         .overlay {
@@ -416,7 +416,6 @@ struct StoryReadingView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
         }
-        .background(Color(white: 0.98))
     }
 
     private var endingView: some View {

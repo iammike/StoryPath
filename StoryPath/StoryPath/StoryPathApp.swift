@@ -14,6 +14,8 @@ struct StoryPathApp: App {
             ContentView()
                 .preferredColorScheme(.light)
         }
+        #if os(macOS)
         .windowResizability(.contentSize)
+        #endif
     }
 }
