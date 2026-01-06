@@ -10,6 +10,11 @@ struct StoryLibraryView: View {
     @State private var selectedStoryId: String?
     @State private var presentedStory: Story?
     @State private var navigationPath = NavigationPath()
+    // Triggers view recreation to refresh progress data from UserDefaults.
+    // Using .id() is intentional - progress is fetched synchronously via viewModel.progress(for:),
+    // so we need the view to re-render to call those functions again. See issue #101 for a more
+    // efficient approach using observable progress data in the ViewModel.
+    @State private var contentRefreshKey = 0
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -30,6 +35,7 @@ struct StoryLibraryView: View {
                             emptyView
                         } else {
                             contentView
+                                .id(contentRefreshKey)
                         }
                     }
                     .padding(.horizontal, 20)
@@ -66,6 +72,12 @@ struct StoryLibraryView: View {
         }
         .task {
             await viewModel.loadStories()
+        }
+        .onChange(of: navigationPath) { oldPath, newPath in
+            // Refresh progress when navigating back (path length decreases)
+            if newPath.count < oldPath.count {
+                contentRefreshKey += 1
+            }
         }
     }
 
