@@ -732,8 +732,47 @@ struct StoryPathTests {
             )
             progressService.saveProgress(progress)
 
+            // Must refresh cache to pick up changes from UserDefaults
+            viewModel.refreshProgress()
+
             #expect(viewModel.progress(for: firstStory.id) != nil)
         }
+    }
+
+    @Test func testLibraryViewModelRefreshProgress() async throws {
+        let testDefaults = UserDefaults(suiteName: "test-library-refresh")!
+        testDefaults.removePersistentDomain(forName: "test-library-refresh")
+
+        let progressService = ProgressService(userDefaults: testDefaults)
+        let viewModel = StoryLibraryViewModel(
+            progressService: progressService
+        )
+
+        await viewModel.loadStories()
+
+        guard let firstStory = viewModel.stories.first else {
+            Issue.record("No stories loaded")
+            return
+        }
+
+        // No progress initially
+        #expect(viewModel.progress(for: firstStory.id) == nil)
+
+        // Save progress externally (simulates reading view saving progress)
+        var progress = progressService.createNewProgress(
+            for: firstStory.id,
+            startingSegmentId: "start"
+        )
+        progress.completedPaths.insert("test-path")
+        progressService.saveProgress(progress)
+
+        // Cache still shows no progress until refreshed
+        #expect(viewModel.progress(for: firstStory.id) == nil)
+
+        // After refresh, progress is visible
+        viewModel.refreshProgress()
+        #expect(viewModel.progress(for: firstStory.id) != nil)
+        #expect(viewModel.progress(for: firstStory.id)?.completedPaths.contains("test-path") == true)
     }
 
     @Test func testLibraryViewModelFeaturedWithProgress() async throws {
@@ -755,6 +794,9 @@ struct StoryPathTests {
             )
             progress.lastReadDate = Date()
             progressService.saveProgress(progress)
+
+            // Must refresh cache to pick up changes from UserDefaults
+            viewModel.refreshProgress()
 
             // Featured should be the story with most recent progress
             #expect(viewModel.featuredStory?.id == story.id)
