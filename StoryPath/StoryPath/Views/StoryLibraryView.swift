@@ -8,33 +8,56 @@ import SwiftUI
 struct StoryLibraryView: View {
     @State private var viewModel = StoryLibraryViewModel()
     @State private var selectedStoryId: String?
+    @State private var presentedStory: Story?
+    @State private var navigationPath = NavigationPath()
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Custom header
-                Text("Stories")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+        NavigationStack(path: $navigationPath) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Custom header
+                    Text("Stories")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
 
-                if viewModel.isLoading {
-                    loadingView
-                } else if viewModel.stories.isEmpty {
-                    emptyView
-                } else {
-                    contentView
+                    if viewModel.isLoading {
+                        loadingView
+                    } else if viewModel.stories.isEmpty {
+                        emptyView
+                    } else {
+                        contentView
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+            }
+            .background(Color(white: 0.98))
+            #if os(iOS)
+            .navigationBarHidden(true)
+            #endif
+            .navigationDestination(for: String.self) { storyId in
+                StoryReadingView(storyId: storyId)
+            }
+        }
+        .sheet(item: $presentedStory) { story in
+            NavigationStack {
+                StoryDetailView(
+                    story: story,
+                    progress: viewModel.progress(for: story.id),
+                    onStartReading: { storyId in
+                        presentedStory = nil
+                        navigationPath.append(storyId)
+                    }
+                )
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Done") {
+                            presentedStory = nil
+                        }
+                    }
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
-            .padding(.bottom, 16)
-        }
-        .background(Color(white: 0.98))
-        #if os(iOS)
-        .navigationBarHidden(true)
-        #endif
-        .navigationDestination(for: String.self) { storyId in
-            StoryReadingView(storyId: storyId)
         }
         .task {
             await viewModel.loadStories()
@@ -76,7 +99,8 @@ struct StoryLibraryView: View {
                 NavigationLink(value: featured.id) {
                     FeaturedStoryCard(
                         story: featured,
-                        progress: viewModel.progress(for: featured.id)
+                        progress: viewModel.progress(for: featured.id),
+                        onInfoTapped: { presentedStory = featured }
                     )
                 }
                 .buttonStyle(.plain)
@@ -95,7 +119,8 @@ struct StoryLibraryView: View {
                                 NavigationLink(value: story.id) {
                                     StoryThumbnail(
                                         story: story,
-                                        progress: viewModel.progress(for: story.id)
+                                        progress: viewModel.progress(for: story.id),
+                                        onInfoTapped: { presentedStory = story }
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -109,7 +134,5 @@ struct StoryLibraryView: View {
 }
 
 #Preview {
-    NavigationStack {
-        StoryLibraryView()
-    }
+    StoryLibraryView()
 }

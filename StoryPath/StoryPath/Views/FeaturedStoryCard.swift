@@ -8,6 +8,7 @@ import SwiftUI
 struct FeaturedStoryCard: View {
     let story: Story
     let progress: UserProgress?
+    var onInfoTapped: (() -> Void)?
 
     private var thumbnailImage: String? {
         // Try cover image first, then fall back to first segment's image
@@ -45,7 +46,7 @@ struct FeaturedStoryCard: View {
     var body: some View {
         VStack(spacing: 0) {
             // Featured image
-            ZStack(alignment: .topTrailing) {
+            ZStack {
                 GeometryReader { geometry in
                     if let imageName = thumbnailImage {
                         Image(imageName)
@@ -65,12 +66,34 @@ struct FeaturedStoryCard: View {
                 }
                 .aspectRatio(16/9, contentMode: .fit)
 
-                if isComplete {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundStyle(.white)
-                        .background(Circle().fill(Color.green).padding(-2))
-                        .padding(12)
+                // Overlay indicators
+                VStack {
+                    HStack {
+                        // Info button
+                        if let onInfoTapped {
+                            Button {
+                                onInfoTapped()
+                            } label: {
+                                Image(systemName: "info.circle.fill")
+                                    .font(.system(size: 26))
+                                    .foregroundStyle(.white)
+                                    .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                            }
+                            .padding(12)
+                        }
+
+                        Spacer()
+
+                        // Completion checkmark
+                        if isComplete {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 28))
+                                .foregroundStyle(.white)
+                                .background(Circle().fill(Color.green).padding(-2))
+                                .padding(12)
+                        }
+                    }
+                    Spacer()
                 }
             }
 

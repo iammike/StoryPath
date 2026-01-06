@@ -8,6 +8,7 @@ import SwiftUI
 struct StoryThumbnail: View {
     let story: Story
     let progress: UserProgress?
+    var onInfoTapped: (() -> Void)?
 
     private var thumbnailImage: String? {
         // Try cover image first, then fall back to first segment's image
@@ -37,7 +38,7 @@ struct StoryThumbnail: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Thumbnail image
-            ZStack(alignment: .topTrailing) {
+            ZStack {
                 if let imageName = thumbnailImage {
                     Image(imageName)
                         .resizable()
@@ -56,20 +57,42 @@ struct StoryThumbnail: View {
                         }
                 }
 
-                // Progress indicator
-                if isComplete {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(.white)
-                        .background(Circle().fill(Color.green).padding(-2))
-                        .padding(8)
-                } else if isInProgress {
-                    Image(systemName: "bookmark.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
-                        .padding(8)
+                // Overlay indicators
+                VStack {
+                    HStack {
+                        // Info button
+                        if let onInfoTapped {
+                            Button {
+                                onInfoTapped()
+                            } label: {
+                                Image(systemName: "info.circle.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(.white)
+                                    .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                            }
+                            .padding(6)
+                        }
+
+                        Spacer()
+
+                        // Progress indicator
+                        if isComplete {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundStyle(.white)
+                                .background(Circle().fill(Color.green).padding(-2))
+                                .padding(6)
+                        } else if isInProgress {
+                            Image(systemName: "bookmark.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(Color(red: 0.83, green: 0.66, blue: 0.29))
+                                .padding(6)
+                        }
+                    }
+                    Spacer()
                 }
             }
+            .frame(width: 120, height: 160)
 
             // Title
             Text(story.title)

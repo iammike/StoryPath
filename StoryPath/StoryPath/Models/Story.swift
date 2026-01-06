@@ -71,3 +71,15 @@ struct StoryChoice: Codable, Identifiable {
     let nextSegmentId: String
     let isAuthenticPath: Bool
 }
+
+// MARK: - Hashable conformance for navigation
+
+extension Story: Hashable {
+    static func == (lhs: Story, rhs: Story) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
