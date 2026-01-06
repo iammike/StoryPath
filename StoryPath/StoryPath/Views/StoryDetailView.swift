@@ -96,7 +96,9 @@ struct StoryDetailView: View {
             .padding(.bottom, 40)
         }
         .background(Color(white: 0.98))
+        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         .onDisappear {
             audioService.stop()
         }
