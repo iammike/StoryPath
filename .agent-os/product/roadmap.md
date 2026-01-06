@@ -50,10 +50,12 @@
 - [ ] Story map visualization - Show decision tree and explored/unexplored paths `L`
 - [x] Expand Little Red Riding Hood story text - Richer, more atmospheric prose `M`
 - [x] Minimal story navigation bar - Pull-to-reveal nav with home, restart, and audio toggle `S`
+- [ ] Add story info button to reading nav bar - Access detail view from within story #93 `S`
 
 ### Known Issues
 - [x] Resume banner scrolls with content instead of staying fixed #77
 - [x] Thin white line above illustration in safe area (iPhone) #70
+- [ ] Bookmark icon doesn't clear when story is reset #94
 
 ### Dependencies
 
@@ -109,6 +111,7 @@
 - [ ] Page turning animation - Animated transition between story segments `S`
 - [ ] Reading statistics - Time spent reading, favorite stories, paths explored `S`
 - [ ] Audio customization - Narration speed control, voice selection (if multiple available) `M`
+- [ ] Audio preview for choice buttons - Let non-readers hear choices before selecting #95 `M`
 - [ ] Professional voice narration - Pre-recorded audio narration for stories `L`
 - [ ] Story favorites - Mark and quickly access favorite stories `XS`
 - [ ] Path recommendations - "Haven't tried this path yet" suggestions `S`
