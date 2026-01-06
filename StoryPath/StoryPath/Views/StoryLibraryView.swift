@@ -8,7 +8,7 @@ import SwiftUI
 struct StoryLibraryView: View {
     @State private var viewModel = StoryLibraryViewModel()
     @State private var selectedStoryId: String?
-    @State private var storyForDetail: Story?
+    @State private var presentedStory: Story?
     @State private var navigationPath = NavigationPath()
 
     var body: some View {
@@ -40,20 +40,20 @@ struct StoryLibraryView: View {
                 StoryReadingView(storyId: storyId)
             }
         }
-        .sheet(item: $storyForDetail) { story in
+        .sheet(item: $presentedStory) { story in
             NavigationStack {
                 StoryDetailView(
                     story: story,
                     progress: viewModel.progress(for: story.id),
                     onStartReading: { storyId in
-                        storyForDetail = nil
+                        presentedStory = nil
                         navigationPath.append(storyId)
                     }
                 )
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Done") {
-                            storyForDetail = nil
+                            presentedStory = nil
                         }
                     }
                 }
@@ -100,7 +100,7 @@ struct StoryLibraryView: View {
                     FeaturedStoryCard(
                         story: featured,
                         progress: viewModel.progress(for: featured.id),
-                        onInfoTapped: { storyForDetail = featured }
+                        onInfoTapped: { presentedStory = featured }
                     )
                 }
                 .buttonStyle(.plain)
@@ -120,7 +120,7 @@ struct StoryLibraryView: View {
                                     StoryThumbnail(
                                         story: story,
                                         progress: viewModel.progress(for: story.id),
-                                        onInfoTapped: { storyForDetail = story }
+                                        onInfoTapped: { presentedStory = story }
                                     )
                                 }
                                 .buttonStyle(.plain)
