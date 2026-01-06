@@ -10,6 +10,7 @@ import Foundation
 class StoryLibraryViewModel {
     private(set) var stories: [Story] = []
     private(set) var isLoading = false
+    private(set) var progressCache: [String: UserProgress] = [:]
 
     private let repository: StoryRepository
     private let progressService: ProgressService
@@ -23,11 +24,24 @@ class StoryLibraryViewModel {
         isLoading = true
         await repository.loadStories()
         stories = repository.stories
+        refreshProgress()
         isLoading = false
     }
 
+    /// Reloads progress data from UserDefaults for all stories.
+    /// Call this when returning to the library to pick up any changes made during reading.
+    func refreshProgress() {
+        var newCache: [String: UserProgress] = [:]
+        for story in stories {
+            if let progress = progressService.loadProgress(for: story.id) {
+                newCache[story.id] = progress
+            }
+        }
+        progressCache = newCache
+    }
+
     func progress(for storyId: String) -> UserProgress? {
-        progressService.loadProgress(for: storyId)
+        progressCache[storyId]
     }
 
     /// Returns the featured story - most recently read with progress, or first story
