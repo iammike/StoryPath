@@ -87,7 +87,7 @@
 - [ ] Accessibility improvements - VoiceOver support, Dynamic Type, contrast modes `L`
 - [ ] Performance optimization - Reduce app size, optimize asset loading, smooth animations `M`
 - [ ] App Store assets - Screenshots, preview video, app description, keywords `M`
-- [ ] Professional voice narration - Pre-recorded audio narration for stories `L`
+- [ ] High-quality voice narration - Pre-recorded AI or professional audio narration for stories `L`
 
 ### Dependencies
 
