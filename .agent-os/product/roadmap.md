@@ -41,8 +41,8 @@
 ### Features
 
 - [x] Story library home screen - Grid/list view of available stories with cover art `M`
-- [ ] Story detail/preview screen - Synopsis, sample illustration, estimated reading time, path count `S`
-- [ ] Story provenance metadata - Original author, publication year, cultural origin, historical context `S`
+- [x] Story detail/preview screen - Synopsis, sample illustration, estimated reading time, path count `S`
+- [x] Story provenance metadata - Original author, publication year, cultural origin, historical context `S`
 - [x] Story progress indicators - Visual badges showing completed paths and overall progress `S`
 - [ ] Story collections/categories - Group stories by culture, theme, or collection (Grimm, Aesop, etc.) `M`
 - [ ] Additional stories authored - 4-6 more classic tales with branching narratives and audio `XL`
