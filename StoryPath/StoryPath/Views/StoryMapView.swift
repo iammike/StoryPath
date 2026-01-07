@@ -100,6 +100,7 @@ struct StoryMapView: View {
         }
     }
 
+    // Note: Assumes story graph is a tree (acyclic). Cycles would cause nodes to be skipped.
     private func buildTree() -> [MapNode] {
         var result: [MapNode] = []
         var visited: Set<String> = []

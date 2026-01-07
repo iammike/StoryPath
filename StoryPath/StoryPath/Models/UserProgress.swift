@@ -40,7 +40,9 @@ struct UserProgress: Codable {
     }
 
     mutating func recordSegment(_ segmentId: String) {
-        pathHistory.append(segmentId)
+        if !pathHistory.contains(segmentId) {
+            pathHistory.append(segmentId)
+        }
         visitedSegments.insert(segmentId)
         lastReadDate = Date()
     }
