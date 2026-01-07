@@ -112,7 +112,7 @@ class StoryReadingViewModel {
         currentSegmentId = choice.nextSegmentId
 
         // Track progress
-        progress?.recordChoice(choice.nextSegmentId)
+        progress?.recordSegment(choice.nextSegmentId)
         progress?.currentSegmentId = choice.nextSegmentId
 
         // Check if we reached an ending

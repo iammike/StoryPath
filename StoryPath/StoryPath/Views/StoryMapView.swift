@@ -256,7 +256,7 @@ struct StoryMapView: View {
     private func nodeIconColor(isEnding: Bool, isAuthentic: Bool, isExplored: Bool) -> Color {
         // Unexplored: gray icon (no spoilers!)
         // Explored: white icon on colored background
-        return isExplored ? .white : .gray
+        return isExplored ? .white : Color.gray.opacity(0.4)
     }
 }
 

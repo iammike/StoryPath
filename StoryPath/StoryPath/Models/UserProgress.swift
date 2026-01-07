@@ -39,7 +39,7 @@ struct UserProgress: Codable {
         self.completionPercentage = completionPercentage
     }
 
-    mutating func recordChoice(_ segmentId: String) {
+    mutating func recordSegment(_ segmentId: String) {
         pathHistory.append(segmentId)
         visitedSegments.insert(segmentId)
         lastReadDate = Date()
