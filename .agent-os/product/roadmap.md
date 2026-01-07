@@ -47,10 +47,10 @@
 - [ ] Story collections/categories - Group stories by culture, theme, or collection (Grimm, Aesop, etc.) `M`
 - [ ] Additional stories authored - 2 more classic tales with branching narratives and audio `L`
 - [x] Illustration system - Display and manage story illustrations tied to scenes `M`
-- [ ] Story map visualization - Show decision tree and explored/unexplored paths `L`
+- [x] Story map visualization - Show decision tree and explored/unexplored paths `L`
 - [x] Expand Little Red Riding Hood story text - Richer, more atmospheric prose `M`
 - [x] Minimal story navigation bar - Pull-to-reveal nav with home, restart, and audio toggle `S`
-- [ ] Add story info button to reading nav bar - Access detail view from within story #93 `S`
+- [x] Add story info button to reading nav bar - Access detail view from within story #93 `S`
 
 ### Known Issues
 - [x] Resume banner scrolls with content instead of staying fixed #77
