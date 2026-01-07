@@ -34,9 +34,9 @@ struct StoryMapView: View {
         buildTree()
     }
 
-    // Set of explored segment IDs
+    // Set of explored segment IDs (all segments ever visited)
     private var exploredSegments: Set<String> {
-        Set(progress?.pathHistory ?? [])
+        progress?.visitedSegments ?? []
     }
 
     // Segment lookup
@@ -45,29 +45,59 @@ struct StoryMapView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView([.horizontal, .vertical], showsIndicators: true) {
-                ZStack(alignment: .topLeading) {
-                    // Draw edges first (behind nodes)
-                    ForEach(nodes) { node in
-                        ForEach(Array(node.children.enumerated()), id: \.element.id) { index, edge in
-                            if let childNode = nodes.first(where: { $0.id == edge.childId }) {
-                                edgeLine(from: node, to: childNode, edge: edge, siblingIndex: index, siblingCount: node.children.count)
+        VStack(spacing: 0) {
+            GeometryReader { geometry in
+                ScrollView([.horizontal, .vertical], showsIndicators: true) {
+                    ZStack(alignment: .topLeading) {
+                        // Draw edges first (behind nodes)
+                        ForEach(nodes) { node in
+                            ForEach(Array(node.children.enumerated()), id: \.element.id) { index, edge in
+                                if let childNode = nodes.first(where: { $0.id == edge.childId }) {
+                                    edgeLine(from: node, to: childNode, edge: edge, siblingIndex: index, siblingCount: node.children.count)
+                                }
                             }
                         }
-                    }
 
-                    // Draw nodes
-                    ForEach(nodes) { node in
-                        nodeView(for: node)
-                            .position(nodePosition(for: node))
+                        // Draw nodes
+                        ForEach(nodes) { node in
+                            nodeView(for: node)
+                                .position(nodePosition(for: node))
+                        }
                     }
+                    .frame(width: calculateWidth(), height: calculateHeight())
+                    .padding(40)
                 }
-                .frame(width: calculateWidth(), height: calculateHeight())
-                .padding(40)
             }
+
+            // Legend
+            mapLegend
         }
         .background(Color(white: 0.98))
+    }
+
+    private var mapLegend: some View {
+        VStack(spacing: 12) {
+            Divider()
+            HStack(spacing: 16) {
+                legendItem(icon: "play.fill", color: accentColor, label: "Start")
+                legendItem(icon: "star.fill", color: accentColor, label: "Original")
+                legendItem(icon: "flag.fill", color: .green, label: "Alternate")
+                legendItem(icon: "circle.fill", color: .gray.opacity(0.4), label: "Unexplored")
+            }
+            .font(.caption)
+            .padding(.horizontal)
+            .padding(.bottom, 12)
+        }
+        .background(Color(white: 0.98))
+    }
+
+    private func legendItem(icon: String, color: Color, label: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .foregroundStyle(color)
+            Text(label)
+                .foregroundStyle(.secondary)
+        }
     }
 
     private func buildTree() -> [MapNode] {
@@ -157,20 +187,21 @@ struct StoryMapView: View {
     private func nodeView(for node: MapNode) -> some View {
         let isExplored = exploredSegments.contains(node.id)
         let isEnding = node.segment.isEnding
+        let isAuthentic = node.segment.isAuthenticPath
         let isStart = node.id == story.segments.first?.id
 
         return ZStack {
             Circle()
-                .fill(nodeColor(isEnding: isEnding, isExplored: isExplored))
+                .fill(nodeColor(isEnding: isEnding, isAuthentic: isAuthentic, isExplored: isExplored))
                 .frame(width: nodeSize, height: nodeSize)
 
             Circle()
-                .stroke(nodeBorderColor(isEnding: isEnding, isExplored: isExplored), lineWidth: 2)
+                .stroke(nodeBorderColor(isEnding: isEnding, isAuthentic: isAuthentic, isExplored: isExplored), lineWidth: 2)
                 .frame(width: nodeSize, height: nodeSize)
 
-            Image(systemName: nodeIcon(isStart: isStart, isEnding: isEnding))
+            Image(systemName: nodeIcon(isStart: isStart, isEnding: isEnding, isAuthentic: isAuthentic))
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(isExplored ? .white : .gray)
+                .foregroundStyle(nodeIconColor(isEnding: isEnding, isAuthentic: isAuthentic, isExplored: isExplored))
         }
     }
 
@@ -185,32 +216,47 @@ struct StoryMapView: View {
         }
         .stroke(
             isExplored ? accentColor : Color.gray.opacity(0.3),
-            style: StrokeStyle(lineWidth: edge.choice.isAuthenticPath ? 3 : 2)
+            lineWidth: 2
         )
     }
 
-    private func nodeColor(isEnding: Bool, isExplored: Bool) -> Color {
-        if isEnding {
-            return isExplored ? Color.green : Color.gray.opacity(0.2)
+    private func nodeColor(isEnding: Bool, isAuthentic: Bool, isExplored: Bool) -> Color {
+        // Unexplored nodes are empty (white fill)
+        guard isExplored else {
+            return .white
         }
-        return isExplored ? accentColor : Color.gray.opacity(0.2)
+
+        // Explored nodes are solid filled
+        if isEnding && !isAuthentic {
+            return .green
+        }
+        return accentColor
     }
 
-    private func nodeBorderColor(isEnding: Bool, isExplored: Bool) -> Color {
-        if isEnding {
-            return isExplored ? Color.green : Color.gray.opacity(0.4)
+    private func nodeBorderColor(isEnding: Bool, isAuthentic: Bool, isExplored: Bool) -> Color {
+        guard isExplored else {
+            return Color.gray.opacity(0.4)  // All unexplored = gray border (no spoilers!)
         }
-        return isExplored ? accentColor : Color.gray.opacity(0.4)
+        if isEnding {
+            return isAuthentic ? accentColor : .green
+        }
+        return accentColor
     }
 
-    private func nodeIcon(isStart: Bool, isEnding: Bool) -> String {
+    private func nodeIcon(isStart: Bool, isEnding: Bool, isAuthentic: Bool) -> String {
         if isEnding {
-            return "flag.fill"
+            return isAuthentic ? "star.fill" : "flag.fill"
         } else if isStart {
             return "play.fill"
         } else {
             return "circle.fill"
         }
+    }
+
+    private func nodeIconColor(isEnding: Bool, isAuthentic: Bool, isExplored: Bool) -> Color {
+        // Unexplored: gray icon (no spoilers!)
+        // Explored: white icon on colored background
+        return isExplored ? .white : .gray
     }
 }
 
@@ -247,6 +293,7 @@ struct StoryMapView: View {
             storyId: "preview",
             currentSegmentId: "left",
             pathHistory: ["start", "left"],
+            visitedSegments: ["start", "left"],
             completedPaths: [],
             lastReadDate: Date(),
             completionPercentage: 0
