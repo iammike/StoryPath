@@ -33,6 +33,7 @@ class ProgressService {
             storyId: storyId,
             currentSegmentId: startingSegmentId,
             pathHistory: [startingSegmentId],
+            visitedSegments: [startingSegmentId],
             completedPaths: [],
             lastReadDate: Date(),
             completionPercentage: 0.0

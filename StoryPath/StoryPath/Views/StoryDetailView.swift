@@ -17,6 +17,7 @@ struct StoryDetailView: View {
     var showActionButton: Bool = true
 
     @State private var audioService = AudioService()
+    @State private var showStoryMap = false
 
     // MARK: - Computed Properties
 
@@ -86,6 +87,7 @@ struct StoryDetailView: View {
                 statsRow
                 if showProgress {
                     progressSection
+                    storyMapSection
                 }
                 synopsisSection
                 if hasProvenance {
@@ -104,6 +106,22 @@ struct StoryDetailView: View {
         #endif
         .onDisappear {
             audioService.stop()
+        }
+        .sheet(isPresented: $showStoryMap) {
+            NavigationStack {
+                StoryMapView(story: story, progress: progress)
+                    .navigationTitle("Story Map")
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") {
+                                showStoryMap = false
+                            }
+                        }
+                    }
+            }
         }
     }
 
@@ -236,6 +254,29 @@ struct StoryDetailView: View {
         .cornerRadius(12)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Story origins: \(story.culturalOrigin ?? "") \(story.originalSource.map { "from \($0)" } ?? "")")
+    }
+
+    // MARK: - Story Map Section
+
+    private var storyMapSection: some View {
+        Button {
+            showStoryMap = true
+        } label: {
+            HStack {
+                Label("View Story Map", systemImage: "map")
+                    .font(.subheadline.weight(.medium))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .foregroundStyle(.primary)
+            .padding(16)
+            .background(Color.gray.opacity(0.08))
+            .cornerRadius(12)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("View story map showing all paths")
     }
 
     // MARK: - Action Button
