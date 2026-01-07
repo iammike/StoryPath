@@ -14,6 +14,7 @@ struct StoryDetailView: View {
     let story: Story
     let progress: UserProgress?
     var onStartReading: ((String) -> Void)?
+    var showActionButton: Bool = true
 
     @State private var audioService = AudioService()
 
@@ -90,7 +91,9 @@ struct StoryDetailView: View {
                 if hasProvenance {
                     provenanceSection
                 }
-                actionButton
+                if showActionButton {
+                    actionButton
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 40)

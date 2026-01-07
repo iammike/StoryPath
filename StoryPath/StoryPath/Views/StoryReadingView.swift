@@ -21,6 +21,7 @@ struct StoryReadingView: View {
     @State private var fullscreenImage: String?
     @State private var showNavBar = false
     @State private var showPullHint = false
+    @State private var showStoryDetail = false
     @State private var showResumeIndicator = false
     @State private var hasShownResumeIndicator = false
     @State private var resumeIndicatorTask: Task<Void, Never>?
@@ -107,6 +108,24 @@ struct StoryReadingView: View {
                 viewModel.speakCurrentSegment()
             }
         }
+        .sheet(isPresented: $showStoryDetail) {
+            if let story = viewModel.story {
+                NavigationStack {
+                    StoryDetailView(
+                        story: story,
+                        progress: viewModel.progress,
+                        showActionButton: false
+                    )
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") {
+                                showStoryDetail = false
+                            }
+                        }
+                    }
+                }
+            }
+        }
         #if os(iOS)
         .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
             let newOrientation = UIDevice.current.orientation
@@ -154,7 +173,18 @@ struct StoryReadingView: View {
 
             Spacer()
 
+            // Story info button
+            Button {
+                showStoryDetail = true
+            } label: {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(accentColor)
+            }
+            .accessibilityLabel("Story information")
+
             audioControlButton
+                .padding(.leading, 16)
 
             // Hide menu button
             Button {
